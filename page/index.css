@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  width: 350px;
+  height: 550px;
+}
+
+#root {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: scroll;
+}
+
+* {
+  letter-spacing: -2%;
+}
+
+h3 {
+  @apply font-bold text-mono-500 text-2xl;
+}
+
+b {
+  @apply text-mono-500;
+}
+
+p {
+  @apply text-mono-400;
+}

@@ -5,12 +5,12 @@
   "description": "Scorecard: Free Gradebook Viewer for Frontline with Grade Testing, History, and GPA.",
   "homepage_url": "https://scorecard.to",
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "page/index.html"
   },
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage", "webRequest", "scripting"],
+  "permissions": ["storage", "webRequest", "scripting", "cookies"],
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "assets/icons/sm.png",
