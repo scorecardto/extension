@@ -10,7 +10,13 @@
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage", "webRequest", "scripting", "cookies"],
+  "permissions": ["storage", "webRequest", "scripting"],
+  "externally_connectable": {
+    "matches": [
+      "https://scorecard-iota.vercel.app/*",
+      "http://localhost:4999/*"
+    ]
+  },
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "assets/icons/sm.png",
