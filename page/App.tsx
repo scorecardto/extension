@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Main from "./components/main/Main";
 import { DataContext } from "./components/util/context/DataContext";
 import { GradebookRecord } from "scorecard-types";
 import Dexie from "dexie";
+import { MantineProvider } from "@mantine/core";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
@@ -21,7 +22,7 @@ function App() {
   const db = new Dexie("scorecard");
 
   db.version(1).stores({
-    records: "++id, date, data",
+    records: "++id, date, data, gradingPeriods",
   });
 
   const record = db.table("records").orderBy("date").last();
@@ -34,11 +35,13 @@ function App() {
 
   return (
     <div>
-      <DataContext.Provider
-        value={{ data, setData, gradingPeriod, setGradingPeriod }}
-      >
-        <Main />
-      </DataContext.Provider>
+      <MantineProvider withGlobalStyles withNormalizeCSS>
+        <DataContext.Provider
+          value={{ data, setData, gradingPeriod, setGradingPeriod }}
+        >
+          <Main />
+        </DataContext.Provider>
+      </MantineProvider>
     </div>
   );
 }

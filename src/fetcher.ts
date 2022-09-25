@@ -337,10 +337,15 @@ const fetchAssignmentsForAllCourses = async (
   };
 };
 
-const addRecordToDb = (db: Dexie, assignments: CourseAssignments[]) => {
+const addRecordToDb = (
+  db: Dexie,
+  assignments: CourseAssignments[],
+  gradePeriods: string[]
+) => {
   db.table("records").add({
     date: Date.now(),
     data: assignments,
+    gradePeriods,
   });
 };
 
@@ -351,6 +356,8 @@ const fetchAllContent = async (
 ): Promise<AllContentResponse> => {
   const reportCard = await fetchReportCard(host, username, password);
 
+  const gradingPeriods = reportCard.columnNames;
+
   const assignmentsAllCoursesResponse = await fetchAssignmentsForAllCourses(
     host,
     reportCard.sessionId,
@@ -358,7 +365,10 @@ const fetchAllContent = async (
     reportCard.courses
   );
 
-  return assignmentsAllCoursesResponse;
+  return {
+    ...assignmentsAllCoursesResponse,
+    gradingPeriods,
+  };
 };
 
 export {
