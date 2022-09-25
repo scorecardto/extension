@@ -8,7 +8,8 @@
     "default_popup": "page/index.html"
   },
   "background": {
-    "service_worker": "src/background.js"
+    "service_worker": "src/background.js",
+    "type": "module"
   },
   "permissions": ["storage", "webRequest", "scripting"],
   "externally_connectable": {

@@ -7,9 +7,15 @@ export const DataContext = createContext<DataProvider>({
   setData: () => {
     /* do nothing */
   },
+  gradingPeriod: 0,
+  setGradingPeriod: () => {
+    /* do nothing */
+  },
 });
 
 export type DataProvider = {
+  gradingPeriod: number;
+  setGradingPeriod: Dispatch<SetStateAction<number>>;
   data: GradebookRecord | null;
   setData: Dispatch<SetStateAction<GradebookRecord | null>>;
 };

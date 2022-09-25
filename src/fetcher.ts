@@ -8,7 +8,6 @@ import {
   Assignment,
   AssignmentsAllCoursesResponse,
   Category,
-  CategoryDetails,
   Course,
   CourseAssignments,
   CourseAssignmentsResponse,
@@ -108,7 +107,7 @@ const fetchReportCard = async (
   const reportCardsHtml = parse(reportCardsResponse);
 
   const courseElements = reportCardsHtml.querySelectorAll(
-    ".studentGradingBottomLeft tr:not(:first-child) td:first-child"
+    ".studentGradingBottomLeft tr:not(:first-child) td:nth-child(4)"
   );
 
   const columnNames: string[] = [];
@@ -118,9 +117,7 @@ const fetchReportCard = async (
   courseElements.forEach((courseElement, idx) => {
     const courseKey: string = courseElement.getAttribute("cellkey")!;
 
-    const name =
-      qs.parse(courseKey, { delimiter: "," })["courseIndex"]?.toString() ??
-      "Untitled Course";
+    const name = courseElement.textContent;
 
     const grades: Course["grades"] = [];
 
@@ -245,7 +242,7 @@ const fetchAssignments = async (
 
     c.querySelectorAll("tbody.tblBody > tr").forEach((a) => {
       const elementList = a.querySelectorAll("*");
-      let error: Assignment["error"] = false;
+      const error: Assignment["error"] = false;
 
       const name: Assignment["name"] = elementList[nameIndex].textContent;
       const grade: Assignment["grade"] = parseInt(
@@ -317,7 +314,7 @@ const fetchAssignmentsForAllCourses = async (
 
   let referer = oldReferer;
 
-  for (let course of courses) {
+  for (const course of courses) {
     const assignmentsResponse = await fetchAssignments(
       host,
       sessionId,
