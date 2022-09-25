@@ -340,12 +340,12 @@ const fetchAssignmentsForAllCourses = async (
 const addRecordToDb = (
   db: Dexie,
   assignments: CourseAssignments[],
-  gradePeriods: string[]
+  gradingPeriods: string[]
 ) => {
   db.table("records").add({
     date: Date.now(),
     data: assignments,
-    gradePeriods,
+    gradingPeriods,
   });
 };
 

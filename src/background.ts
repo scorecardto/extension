@@ -5,7 +5,7 @@ import { addRecordToDb, fetchAllContent } from "./fetcher";
 const db = new Dexie("scorecard");
 
 db.version(1).stores({
-  records: "++id, date, data",
+  records: "++id, date, data, gradingPeriods",
 });
 
 chrome.runtime.onConnectExternal.addListener((port) => {
@@ -30,6 +30,6 @@ chrome.storage.local.get(["login"], async (res) => {
       password
     );
 
-    addRecordToDb(db, allContent.courses);
+    addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
   }
 });

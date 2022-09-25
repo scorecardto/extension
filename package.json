@@ -8,9 +8,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@mantine/core": "^5.4.1",
-    "@mantine/hooks": "^5.4.1",
     "@types/chrome": "^0.0.193",
     "dexie": "^3.2.2",
     "form-data": "^4.0.0",
