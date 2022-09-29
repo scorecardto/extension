@@ -5,9 +5,13 @@ export const LoadingContext = createContext<LoadingProvider>({
   setLoading: () => {
     /* do nothing */
   },
+  reloadContent: () => {
+    /* do nothing */
+  },
 });
 
 export type LoadingProvider = {
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
+  reloadContent: () => void;
 };

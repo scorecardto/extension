@@ -14,22 +14,43 @@ chrome.runtime.onConnectExternal.addListener((port) => {
   // port.onMessage.addListener((msg) => {});
 });
 
-chrome.storage.local.get(["login"], async (res) => {
-  db.table("records").toArray().then(console.log);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("got a message");
 
-  if (res["login"]) {
-    const login = res["login"];
+  if (request.type === "requestContentReload") {
+    fetchAndStoreContent().then((result) => {
+      console.log("sending response");
 
-    const host = login.host;
-    const username = login.username;
-    const password = login.password;
-
-    const allContent: AllContentResponse = await fetchAllContent(
-      host,
-      username,
-      password
-    );
-
-    addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+      sendResponse({ result: result || "SUCCESS" });
+    });
   }
+
+  sendResponse(false);
 });
+
+const fetchAndStoreContent = () => {
+  return new Promise<string | undefined>((resolve) => {
+    chrome.storage.local.get(["login"], async (res) => {
+      if (res["login"]) {
+        const login = res["login"];
+
+        const host = login.host;
+        const username = login.username;
+        const password = login.password;
+
+        const allContent: AllContentResponse = await fetchAllContent(
+          host,
+          username,
+          password
+        );
+
+        addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+
+        console.log("done fetching");
+        resolve(undefined);
+      } else {
+        resolve("LOGIN_NOT_FOUND");
+      }
+    });
+  });
+};
