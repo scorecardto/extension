@@ -23,10 +23,12 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const length = data?.data[0].grades.filter((g) => g).length;
+    if (data?.data[0]) {
+      const length = data.data[0].grades.filter((g) => g).length;
 
-    if (length) {
-      setGradingPeriod(Math.max(0, length - 1));
+      if (length) {
+        setGradingPeriod(Math.max(0, length - 1));
+      }
     }
   }, [data]);
 
@@ -39,6 +41,7 @@ function App() {
   useEffect(() => {
     if (!loading) {
       const record = db.table("records").orderBy("date").last();
+
       record.then(setData);
     }
   }, [loading]);
@@ -50,10 +53,21 @@ function App() {
       {
         type: "requestContentReload",
       },
-      (res) => {
-        setLoading(false);
+      () => {
+        // do nothing
       }
     );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+    const listener = (request: any, sender: any, sendResponse: any) => {
+      if (request.type === "requestContentReloadResponse") {
+        setLoading(false);
+        chrome.runtime.onMessage.removeListener(listener);
+      }
+      sendResponse(false);
+    };
+
+    chrome.runtime.onMessage.addListener(listener);
   };
 
   return (

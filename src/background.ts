@@ -15,17 +15,23 @@ chrome.runtime.onConnectExternal.addListener((port) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("got a message");
-
   if (request.type === "requestContentReload") {
-    fetchAndStoreContent().then((result) => {
-      console.log("sending response");
+    const contentPromise = fetchAndStoreContent();
 
-      sendResponse({ result: result || "SUCCESS" });
+    contentPromise.then((result) => {
+      chrome.runtime.sendMessage(
+        {
+          type: "requestContentReloadResponse",
+          result: result || "SUCCESS",
+        },
+        () => {
+          // do nothing
+        }
+      );
     });
-  }
 
-  sendResponse(false);
+    sendResponse(false);
+  }
 });
 
 const fetchAndStoreContent = () => {
@@ -44,9 +50,8 @@ const fetchAndStoreContent = () => {
           password
         );
 
-        addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+        await addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
 
-        console.log("done fetching");
         resolve(undefined);
       } else {
         resolve("LOGIN_NOT_FOUND");
