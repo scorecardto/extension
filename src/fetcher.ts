@@ -342,10 +342,16 @@ const addRecordToDb = (
   assignments: CourseAssignments[],
   gradingPeriods: string[]
 ) => {
-  db.table("records").add({
-    date: Date.now(),
-    data: assignments,
-    gradingPeriods,
+  return new Promise<void>((resolve) => {
+    db.table("records")
+      .add({
+        date: Date.now(),
+        data: assignments,
+        gradingPeriods,
+      })
+      .then(() => {
+        resolve();
+      });
   });
 };
 
