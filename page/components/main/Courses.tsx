@@ -20,7 +20,7 @@ function Courses() {
     <div className="mt-14 mb-52 mx-3">
       {courses ? (
         <div>
-          <div className="border border-mono-200 rounded-xl">
+          <div className="border border-mono-200 rounded-xl overflow-hidden">
             {courses.map((c, i) => {
               return (
                 <CourseGrade
