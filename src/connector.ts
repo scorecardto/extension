@@ -1,12 +1,24 @@
 import Dexie from "dexie";
-import { AllContentResponse } from "scorecard-types";
+import { AllContentResponse, GradebookRecord } from "scorecard-types";
 import { addRecordToDb, fetchAllContent } from "./fetcher";
 
 function startExternalConnection(db: Dexie) {
   chrome.runtime.onConnectExternal.addListener((port) => {
     port.postMessage({ type: "handshake", version: 0.1 });
 
-    // port.onMessage.addListener((msg) => {});
+    db.table("records")
+      .orderBy("date")
+      .last()
+      .then((record: GradebookRecord) => {
+        port.postMessage({
+          type: "setCourses",
+          record: record.data,
+        });
+      });
+
+    port.onMessage.addListener((msg) => {
+      // do nothing
+    });
   });
 }
 
