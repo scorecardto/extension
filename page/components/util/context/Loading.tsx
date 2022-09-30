@@ -10,7 +10,7 @@ export default function Loading(props: { size?: number }) {
       viewBox="0 0 84.03 84.03"
       width={`${size}px`}
       height={`${size}px`}
-      className="animate-spin-slow"
+      className="animate-spin"
     >
       <defs>
         <linearGradient
