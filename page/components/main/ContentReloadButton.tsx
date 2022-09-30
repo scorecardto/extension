@@ -7,7 +7,7 @@ export default function ContentReloadButton(props: { lastUpdated: number }) {
   const loadingContext = React.useContext(LoadingContext);
 
   return (
-    <div>
+    <div className="flex justify-center pt-2">
       {loadingContext.loading ? (
         <div className="text-xs text-mono-400 flex flex-row gap-1 items-center group cursor-pointer w-fit">
           Loading
