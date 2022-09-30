@@ -27,6 +27,35 @@ module.exports = {
           500: "#333333",
         },
       },
+      animation: {
+        "fade-in": "fade-in 0.3s linear",
+        "slide-sm-left": "slide-sm-left 0.2s ease",
+        "slide-sm-right": "slide-sm-right 0.2s ease",
+        "slide-sm-up": "slide-sm-up 0.2s ease",
+        "slide-sm-down": "slide-sm-down 0.2s ease",
+      },
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
+        "slide-sm-left": {
+          "0%": { opacity: 0, transform: "translateX(-20px)" },
+          "100%": { opacity: 1, transform: "" },
+        },
+        "slide-sm-right": {
+          "0%": { opacity: 0, transform: "translateX(20px)" },
+          "100%": { opacity: 1, transform: "" },
+        },
+        "slide-sm-up": {
+          "0%": { opacity: 0, transform: "translateY(20px)" },
+          "100%": { opacity: 1, transform: "" },
+        },
+        "slide-sm-down": {
+          "0%": { opacity: 0, transform: "translateY(-20px)" },
+          "100%": { opacity: 1, transform: "" },
+        },
+      },
     },
   },
   plugins: [

@@ -24,5 +24,10 @@
     "48": "assets/icons/md.png",
     "128": "assets/icons/lg.png"
   },
-  "web_accessible_resources": []
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["https://scorecard.to/*"]
+    }
+  ]
 }
