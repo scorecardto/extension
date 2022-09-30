@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Main from "./components/main/Main";
-import { DataContext } from "./components/util/context/DataContext";
+import { DataContext } from "scorecard-types/DataContext";
 import { GradebookRecord } from "scorecard-types";
 import Dexie from "dexie";
-import { LoadingContext } from "./components/util/context/LoadingContext";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);

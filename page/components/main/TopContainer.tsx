@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Loading from "../util/context/Loading";
-import { LoadingContext } from "../util/context/LoadingContext";
+import { LoadingContext } from "scorecard-types/LoadingContext";
 import Chip from "./Chip";
 
 function TopContainer() {
