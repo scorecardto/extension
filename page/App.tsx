@@ -29,6 +29,21 @@ function App() {
       if (length) {
         setGradingPeriod(Math.max(0, length - 1));
       }
+
+      const THREE_HOURS = 1000 * 60 * 60 * 3;
+
+      if (data.date < Date.now() - THREE_HOURS) {
+        setLoading(true);
+
+        chrome.runtime.sendMessage(
+          {
+            type: "requestContentReload",
+          },
+          () => {
+            // do nothing
+          }
+        );
+      }
     }
   }, [data]);
 
