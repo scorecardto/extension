@@ -20,7 +20,7 @@ function App() {
     [data, gradingPeriod, setGradingPeriod]
   );
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (data?.data[0]) {

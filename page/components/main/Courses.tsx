@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { IoRefreshOutline } from "react-icons/io5";
 import { Course } from "scorecard-types";
 import { DataContext } from "../util/context/DataContext";
+import Loading from "../util/context/Loading";
 import { LoadingContext } from "../util/context/LoadingContext";
 import ContentReloadButton from "./ContentReloadButton";
 import CourseGrade from "./CourseGrade";
@@ -33,7 +34,13 @@ function Courses() {
           {data.data && <ContentReloadButton lastUpdated={data.data.date} />}
         </div>
       ) : (
-        <div onClick={loading.reloadContent}>Nothing loaded yet.</div>
+        <>
+          {loading.loading ? (
+            <Loading />
+          ) : (
+            <div onClick={loading.reloadContent}>Nothing loaded yet.</div>
+          )}
+        </>
       )}
     </div>
   );
