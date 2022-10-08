@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { IoRefreshOutline } from "react-icons/io5";
 import { Course } from "scorecard-types";
-import { DataContext } from "scorecard-types/DataContext";
+import { DataContext } from "scorecard-types";
 import Loading from "../util/context/Loading";
-import { LoadingContext } from "scorecard-types/LoadingContext";
+import { LoadingContext } from "scorecard-types";
 import ContentReloadButton from "./ContentReloadButton";
 import CourseGrade from "./CourseGrade";
 import LastUpdated from "./LastUpdated";

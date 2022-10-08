@@ -1,6 +1,6 @@
 import React from "react";
 import { IoRefreshOutline } from "react-icons/io5";
-import { LoadingContext } from "scorecard-types/LoadingContext";
+import { LoadingContext } from "scorecard-types";
 import LastUpdated from "./LastUpdated";
 
 export default function ContentReloadButton(props: { lastUpdated: number }) {

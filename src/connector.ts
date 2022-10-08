@@ -12,7 +12,7 @@ function startExternalConnection(db: Dexie) {
       .then((record: GradebookRecord) => {
         port.postMessage({
           type: "setCourses",
-          record: record.data,
+          record,
         });
       });
 
