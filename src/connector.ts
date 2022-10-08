@@ -6,17 +6,23 @@ function startExternalConnection(db: Dexie) {
   chrome.runtime.onConnectExternal.addListener((port) => {
     port.postMessage({ type: "handshake", version: 0.1 });
 
-    db.table("records")
-      .orderBy("date")
-      .last()
-      .then((record: GradebookRecord) => {
-        port.postMessage({
-          type: "setCourses",
-          record,
+    function sendCourses() {
+      db.table("records")
+        .orderBy("date")
+        .last()
+        .then((record: GradebookRecord) => {
+          port.postMessage({
+            type: "setCourses",
+            record,
+          });
         });
-      });
+    }
 
     port.onMessage.addListener((msg) => {
+      if (msg.type === "requestCourses") {
+        sendCourses();
+      }
+
       // do nothing
     });
   });
