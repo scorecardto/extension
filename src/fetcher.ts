@@ -84,7 +84,23 @@ const fetchReportCard = async (
     },
   };
 
-  const homeLoginResponse = await axios(HOME_LOGIN);
+  // @ts-ignore
+  const homeLoginResponse: string = (await axios(HOME_LOGIN)).data;
+
+  const homeLoginHtml = parse(homeLoginResponse);
+
+  if (
+    homeLoginHtml.querySelector("span.error")?.innerText ===
+    "User ID or Password is incorrect."
+  ) {
+    throw new Error("INCORRECT_PASSWORD");
+  }
+  if (
+    homeLoginHtml.querySelector("span.error")?.innerText ===
+    "The username or password you entered is invalid.  Please try again."
+  ) {
+    throw new Error("INCORRECT_USERNAME");
+  }
 
   const REPORT_CARDS: Options = {
     url: `https://${host}/selfserve/PSSViewReportCardsAction.do?x-tab-id=undefined`,
