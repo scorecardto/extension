@@ -1,5 +1,9 @@
 import Dexie from "dexie";
-import { AllContentResponse, GradebookRecord } from "scorecard-types";
+import {
+  AllContentResponse,
+  GradebookRecord,
+  SetupState,
+} from "scorecard-types";
 import { addRecordToDb, fetchAllContent } from "./fetcher";
 
 function startExternalConnection(db: Dexie) {
@@ -18,9 +22,34 @@ function startExternalConnection(db: Dexie) {
         });
     }
 
+    function sendSetup() {
+      chrome.storage.local.get(["login"], async (res) => {
+        if (res["login"]) {
+          const login = res["login"];
+
+          const setup: SetupState = {
+            username: login["username"],
+            hasPassword: login["password"] !== undefined,
+            host: login["host"],
+          };
+
+          port.postMessage({
+            type: "setSetup",
+            setup: setup,
+          });
+        }
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
+      }
+
+      if (msg.type === "requestSetup") {
+        console.log("got setup request");
+
+        sendSetup();
       }
 
       // do nothing
