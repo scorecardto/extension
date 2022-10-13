@@ -22,6 +22,22 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (data?.data[0]) {
+      const length = data.data[0].grades.filter((g) => g).length;
+
+      if (length) {
+        setGradingPeriod(Math.max(0, length - 1));
+      }
+
+      const TEN_MINUTES = 1000 * 60 * 10;
+
+      if (data.date < Date.now() - TEN_MINUTES) {
+        reloadContent();
+      }
+    }
+  }, [data]);
+
   const db = new Dexie("scorecard");
 
   db.version(1).stores({
