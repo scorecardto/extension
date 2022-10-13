@@ -56,6 +56,13 @@ function startExternalConnection(db: Dexie) {
         await db.table("records").clear();
         await addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
 
+        chrome.storage.local.set({
+          login: {
+            host,
+            username,
+            password,
+          },
+        });
         port.postMessage({
           type: "validLoginResponse",
           result: "VALID",
@@ -78,8 +85,6 @@ function startExternalConnection(db: Dexie) {
       }
 
       if (msg.type === "requestLoginValidation") {
-        console.log("checking login for", msg.host, msg.username, msg.password);
-
         sendValidPassword(msg.host, msg.username, msg.password);
       }
       // do nothing
@@ -90,9 +95,7 @@ function startExternalConnection(db: Dexie) {
 function startInternalConnection(db: Dexie) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "requestContentReload") {
-      const contentPromise = fetchAndStoreContent();
-
-      contentPromise.then((result) => {
+      fetchAndStoreContent().then((result) => {
         chrome.runtime.sendMessage(
           {
             type: "requestContentReloadResponse",

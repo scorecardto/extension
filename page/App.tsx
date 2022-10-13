@@ -22,31 +22,6 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (data?.data[0]) {
-      const length = data.data[0].grades.filter((g) => g).length;
-
-      if (length) {
-        setGradingPeriod(Math.max(0, length - 1));
-      }
-
-      const THREE_HOURS = 1000 * 60 * 60 * 3;
-
-      if (data.date < Date.now() - THREE_HOURS) {
-        setLoading(true);
-
-        chrome.runtime.sendMessage(
-          {
-            type: "requestContentReload",
-          },
-          () => {
-            // do nothing
-          }
-        );
-      }
-    }
-  }, [data]);
-
   const db = new Dexie("scorecard");
 
   db.version(1).stores({
@@ -60,6 +35,10 @@ function App() {
       record.then(setData);
     }
   }, [loading]);
+
+  useEffect(() => {
+    reloadContent();
+  }, []);
 
   const reloadContent = () => {
     setLoading(true);
@@ -76,8 +55,12 @@ function App() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     const listener = (request: any, sender: any, sendResponse: any) => {
       if (request.type === "requestContentReloadResponse") {
-        setLoading(false);
-        chrome.runtime.onMessage.removeListener(listener);
+        if (request.result === "SUCCESS") {
+          setLoading(false);
+          chrome.runtime.onMessage.removeListener(listener);
+        } else {
+          console.log(request.result);
+        }
       }
       sendResponse(false);
     };
