@@ -5,6 +5,7 @@ import {
   SetupState,
 } from "scorecard-types";
 import { addRecordToDb, fetchAllContent } from "./fetcher";
+import { getLogin } from "./util";
 
 function startExternalConnection(db: Dexie) {
   chrome.runtime.onConnectExternal.addListener((port) => {
@@ -37,6 +38,11 @@ function startExternalConnection(db: Dexie) {
             type: "setSetup",
             setup: setup,
           });
+        } else {
+          port.postMessage({
+            type: "setSetup",
+            setup: undefined,
+          });
         }
       });
     }
@@ -44,9 +50,11 @@ function startExternalConnection(db: Dexie) {
     async function sendValidPassword(
       host: string,
       username: string,
-      password: string
+      passwordParam: string
     ) {
       try {
+        const password = passwordParam || (await getLogin())["password"];
+
         const allContent: AllContentResponse = await fetchAllContent(
           host,
           username,

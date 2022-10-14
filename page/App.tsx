@@ -5,6 +5,8 @@ import { DataContext } from "scorecard-types";
 import { GradebookRecord } from "scorecard-types";
 import Dexie from "dexie";
 import { LoadingContext } from "scorecard-types";
+import Loading from "./components/util/context/Loading";
+import Welcome from "./components/main/Welcome";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
@@ -84,11 +86,34 @@ function App() {
     chrome.runtime.onMessage.addListener(listener);
   };
 
+  const [login, setLogin] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    chrome.storage.local.get(["login"], (result) => {
+      setLogin(
+        !!result.login &&
+          !!result.login.username &&
+          !!result.login.password &&
+          !!result.login.host
+      );
+    });
+  }, []);
+
   return (
     <div>
       <LoadingContext.Provider value={{ loading, setLoading, reloadContent }}>
         <DataContext.Provider value={dataContext}>
-          <Main />
+          <>
+            {(() => {
+              if (login === undefined) {
+                return <Loading />;
+              } else if (login === true) {
+                <Main />;
+              } else {
+                return <Welcome />;
+              }
+            })()}
+          </>
         </DataContext.Provider>
       </LoadingContext.Provider>
     </div>
