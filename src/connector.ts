@@ -102,6 +102,8 @@ function startExternalConnection(db: Dexie) {
 
 function startInternalConnection(db: Dexie) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log("Received message", request);
+
     if (request.type === "requestContentReload") {
       fetchAndStoreContent().then((result) => {
         chrome.runtime.sendMessage(
@@ -114,9 +116,8 @@ function startInternalConnection(db: Dexie) {
           }
         );
       });
-
-      sendResponse(false);
     }
+    sendResponse(false);
   });
 
   const fetchAndStoreContent = () => {

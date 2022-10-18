@@ -54,10 +54,6 @@ function App() {
     }
   }, [loading]);
 
-  useEffect(() => {
-    reloadContent();
-  }, []);
-
   const reloadContent = () => {
     setLoading(true);
 
@@ -75,10 +71,10 @@ function App() {
       if (request.type === "requestContentReloadResponse") {
         if (request.result === "SUCCESS") {
           setLoading(false);
-          chrome.runtime.onMessage.removeListener(listener);
         } else {
           console.log(request.result);
         }
+        chrome.runtime.onMessage.removeListener(listener);
       }
       sendResponse(false);
     };
@@ -108,7 +104,7 @@ function App() {
               if (login === undefined) {
                 return <Loading />;
               } else if (login === true) {
-                <Main />;
+                return <Main />;
               } else {
                 return <Welcome />;
               }
