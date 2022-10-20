@@ -102,10 +102,8 @@ function startExternalConnection(db: Dexie) {
 
 function startInternalConnection(db: Dexie) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("Received message", request);
-
     if (request.type === "requestContentReload") {
-      fetchAndStoreContent().then((result) => {
+      fetchAndStoreContent(db).then((result) => {
         chrome.runtime.sendMessage(
           {
             type: "requestContentReloadResponse",
@@ -119,35 +117,31 @@ function startInternalConnection(db: Dexie) {
     }
     sendResponse(false);
   });
-
-  const fetchAndStoreContent = () => {
-    return new Promise<string | undefined>((resolve) => {
-      chrome.storage.local.get(["login"], async (res) => {
-        if (res["login"]) {
-          const login = res["login"];
-
-          const host = login.host;
-          const username = login.username;
-          const password = login.password;
-
-          const allContent: AllContentResponse = await fetchAllContent(
-            host,
-            username,
-            password
-          );
-
-          await addRecordToDb(
-            db,
-            allContent.courses,
-            allContent.gradingPeriods
-          );
-
-          resolve(undefined);
-        } else {
-          resolve("LOGIN_NOT_FOUND");
-        }
-      });
-    });
-  };
 }
+
+const fetchAndStoreContent = (db: Dexie) => {
+  return new Promise<string | undefined>((resolve) => {
+    chrome.storage.local.get(["login"], async (res) => {
+      if (res["login"]) {
+        const login = res["login"];
+
+        const host = login.host;
+        const username = login.username;
+        const password = login.password;
+
+        const allContent: AllContentResponse = await fetchAllContent(
+          host,
+          username,
+          password
+        );
+
+        await addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+
+        resolve(undefined);
+      } else {
+        resolve("LOGIN_NOT_FOUND");
+      }
+    });
+  });
+};
 export { startExternalConnection, startInternalConnection };
