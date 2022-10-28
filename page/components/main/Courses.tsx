@@ -12,9 +12,9 @@ function Courses() {
   const data = useContext(DataContext);
   const loading = useContext(LoadingContext);
 
-  const courses: Course[] | undefined = data.data?.data;
+  const courses: Course[] | undefined = data.data?.courses;
 
-  // const gradingPeriods = data.data?.gradingPeriods;
+  // const gradingCategories = data.data?.gradingCategories;
 
   return (
     <div className="mt-14 mb-52 mx-3">
@@ -25,7 +25,7 @@ function Courses() {
               return (
                 <CourseGrade
                   courseName={c.name}
-                  grade={c.grades[data.gradingPeriod]?.value || "NG"}
+                  grade={c.grades[data.gradeCategory]?.value || "NG"}
                   key={i}
                 />
               );

@@ -10,26 +10,26 @@ import Welcome from "./components/main/Welcome";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
-  const [gradingPeriod, setGradingPeriod] = useState<number>(0);
+  const [gradeCategory, setGradeCategory] = useState<number>(0);
 
   const dataContext = useMemo(
     () => ({
       data,
       setData,
-      gradingPeriod,
-      setGradingPeriod,
+      gradeCategory,
+      setGradeCategory,
     }),
-    [data, gradingPeriod, setGradingPeriod]
+    [data, gradeCategory, setGradeCategory]
   );
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (data?.data[0]) {
-      const length = data.data[0].grades.filter((g) => g).length;
+    if (data?.courses[0]) {
+      const length = data.courses[0].grades.filter((g) => g).length;
 
       if (length) {
-        setGradingPeriod(Math.max(0, length - 1));
+        setGradeCategory(Math.max(0, length - 1));
       }
 
       const TEN_MINUTES = 1000 * 60 * 10;
@@ -42,8 +42,8 @@ function App() {
 
   const db = new Dexie("scorecard");
 
-  db.version(1).stores({
-    records: "++id, date, data, gradingPeriods",
+  db.version(1.1).stores({
+    records: "++id, date, courses, gradeCategoryNames"
   });
 
   useEffect(() => {
@@ -103,7 +103,7 @@ function App() {
             {(() => {
               if (login === undefined) {
                 return <Loading />;
-              } else if (login === true) {
+              } else if (login) {
                 return <Main />;
               } else {
                 return <Welcome />;

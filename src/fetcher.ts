@@ -5,13 +5,12 @@ import qs from "qs";
 
 import {
   AllContentResponse,
+  AllCoursesResponse,
   Assignment,
-  AssignmentsAllCoursesResponse,
-  Category,
+  GradeCategory,
   Course,
-  CourseAssignments,
-  CourseAssignmentsResponse,
-  CourseResponse,
+  GradeCategoriesResponse,
+  CourseResponse
 } from "scorecard-types";
 import Dexie from "dexie";
 
@@ -47,7 +46,6 @@ const fetchReportCard = async (
       Accept: "*/*",
     },
   };
-
   const entryPointResponse = await axios(ENTRY_POINT);
 
   const ENTRY_POINT_LOGIN: Options = {
@@ -61,7 +59,6 @@ const fetchReportCard = async (
       Accept: "*/*",
     },
   };
-
   const entryPointLoginResponse = await axios(ENTRY_POINT_LOGIN);
 
   const HOME_LOGIN: Options = {
@@ -83,7 +80,6 @@ const fetchReportCard = async (
       Accept: "*/*",
     },
   };
-
   // @ts-ignore
   const homeLoginResponse: string = (await axios(HOME_LOGIN)).data;
 
@@ -116,7 +112,6 @@ const fetchReportCard = async (
       Accept: "*/*",
     },
   };
-
   // @ts-ignore
   const reportCardsResponse: string = (await axios(REPORT_CARDS)).data;
 
@@ -175,16 +170,16 @@ const fetchReportCard = async (
     courses,
     sessionId: cookie,
     referer: REPORT_CARDS.url!,
-    columnNames,
+    gradeCategoryNames: columnNames,
   };
 };
 
-const fetchAssignments = async (
+const fetchGradeCategoriesForCourse = async (
   host: string,
   sessionId: string,
   referer: string,
   course: Course
-): Promise<CourseAssignmentsResponse> => {
+): Promise<GradeCategoriesResponse> => {
   const ASSIGNMENTS: Options = {
     url: `https://${host}/selfserve/PSSViewGradeBookEntriesAction.do?x-tab-id=undefined`,
     method: "POST",
@@ -216,7 +211,7 @@ const fetchAssignments = async (
     ".tablePanelContainer"
   );
 
-  const categories: Category[] = categoryElements.map((c) => {
+  const gradeCategories: GradeCategory[] = categoryElements.map((c) => {
     const categoryDetailElements = c.querySelector(".sst-title")?.childNodes!;
 
     let error = false;
@@ -299,7 +294,7 @@ const fetchAssignments = async (
       };
     });
 
-    const cateogry: Category = {
+    return {
       name: categoryDetailElements[0].innerText,
       id: c.id.substring(0, c.id.length - "panelContainer".length),
       average,
@@ -307,31 +302,27 @@ const fetchAssignments = async (
       assignments,
       error,
     };
-
-    return cateogry;
   });
 
-  const response: CourseAssignmentsResponse = {
+  return {
     referer: ASSIGNMENTS.url!,
     sessionId,
-    categories,
+    gradeCategories: gradeCategories,
   };
-
-  return response;
 };
 
-const fetchAssignmentsForAllCourses = async (
+const fetchGradeCategoriesForCourses = async (
   host: string,
   sessionId: string,
   oldReferer: string,
   courses: Course[]
-): Promise<AssignmentsAllCoursesResponse> => {
-  const all: CourseAssignments[] = [];
+): Promise<AllCoursesResponse> => {
+  const all: Course[] = [];
 
   let referer = oldReferer;
 
   for (const course of courses) {
-    const assignmentsResponse = await fetchAssignments(
+    const assignmentsResponse = await fetchGradeCategoriesForCourse(
       host,
       sessionId,
       referer,
@@ -340,7 +331,7 @@ const fetchAssignmentsForAllCourses = async (
 
     all.push({
       ...course,
-      categories: assignmentsResponse.categories,
+      gradeCategories: assignmentsResponse.gradeCategories,
     });
 
     referer = assignmentsResponse.referer;
@@ -355,15 +346,15 @@ const fetchAssignmentsForAllCourses = async (
 
 const addRecordToDb = (
   db: Dexie,
-  assignments: CourseAssignments[],
-  gradingPeriods: string[]
+  courses: Course[],
+  gradeCategoryNames: string[]
 ) => {
   return new Promise<void>((resolve) => {
     db.table("records")
       .add({
         date: Date.now(),
-        data: assignments,
-        gradingPeriods,
+        courses: courses,
+        gradeCategoryNames: gradeCategoryNames
       })
       .then(() => {
         resolve();
@@ -378,9 +369,9 @@ const fetchAllContent = async (
 ): Promise<AllContentResponse> => {
   const reportCard = await fetchReportCard(host, username, password);
 
-  const gradingPeriods = reportCard.columnNames;
+  const gradeCategories = reportCard.gradeCategoryNames;
 
-  const assignmentsAllCoursesResponse = await fetchAssignmentsForAllCourses(
+  const assignmentsAllCoursesResponse = await fetchGradeCategoriesForCourses(
     host,
     reportCard.sessionId,
     reportCard.referer,
@@ -389,14 +380,14 @@ const fetchAllContent = async (
 
   return {
     ...assignmentsAllCoursesResponse,
-    gradingPeriods,
+    gradeCategoryNames: gradeCategories,
   };
 };
 
 export {
   fetchReportCard,
-  fetchAssignments,
+  fetchGradeCategoriesForCourse,
   addRecordToDb,
-  fetchAssignmentsForAllCourses,
+  fetchGradeCategoriesForCourses,
   fetchAllContent,
 };

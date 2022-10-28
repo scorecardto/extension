@@ -62,7 +62,7 @@ function startExternalConnection(db: Dexie) {
         );
 
         await db.table("records").clear();
-        await addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+        await addRecordToDb(db, allContent.courses, allContent.gradeCategoryNames);
 
         chrome.storage.local.set({
           login: {
@@ -135,7 +135,7 @@ const fetchAndStoreContent = (db: Dexie) => {
           password
         );
 
-        await addRecordToDb(db, allContent.courses, allContent.gradingPeriods);
+        await addRecordToDb(db, allContent.courses, allContent.gradeCategoryNames);
 
         resolve(undefined);
       } else {
