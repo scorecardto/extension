@@ -10,7 +10,7 @@ import {
   GradeCategory,
   Course,
   GradeCategoriesResponse,
-  CourseResponse
+  CourseResponse,
 } from "scorecard-types";
 import Dexie from "dexie";
 
@@ -304,8 +304,36 @@ const fetchGradeCategoriesForCourse = async (
     };
   });
 
+  const formData = {
+    selectedIndexId: undefined,
+    selectedTable: undefined,
+    smartFormName: "SmartForm",
+    focusElement: "",
+  };
+
+  gradeCategories.forEach((c) => {
+    formData[`tableMetaInfo_PSSViewGradeBookEntries_${c.id}_SortOrder`] = "";
+    formData[`tableMetaInfo_PSSViewGradeBookEntries_${c.id}_record_count`] =
+      c.assignments?.length;
+    formData[`tableMetaInfo_PSSViewGradeBookEntries_${c.id}_FilterMeta`] = {};
+    formData[`tableId_${c.id}`] = c.id;
+  });
+
+  const BACK_TO_REPORT_CARD: Options = {
+    url: `https://${host}/selfserve/PSSViewReportCardsAction.do?x-tab-id=undefined`,
+    method: "POST",
+    data: toFormData(formData),
+    headers: {
+      Referer: ASSIGNMENTS.url!,
+      Cookie: `JSESSIONID=${sessionId}`,
+      Connection: "keep-alive",
+      "Accept-Encoding": "gzip, deflate, br",
+      Accept: "*/*",
+    },
+  };
+
   return {
-    referer: ASSIGNMENTS.url!,
+    referer: BACK_TO_REPORT_CARD.url!,
     sessionId,
     gradeCategories: gradeCategories,
   };
@@ -321,7 +349,9 @@ const fetchGradeCategoriesForCourses = async (
 
   let referer = oldReferer;
 
-  for (const course of courses) {
+  for (let i = 0; i < courses.length; i++) {
+    const course = courses[i];
+
     const assignmentsResponse = await fetchGradeCategoriesForCourse(
       host,
       sessionId,
@@ -354,7 +384,7 @@ const addRecordToDb = (
       .add({
         date: Date.now(),
         courses: courses,
-        gradeCategoryNames: gradeCategoryNames
+        gradeCategoryNames: gradeCategoryNames,
       })
       .then(() => {
         resolve();

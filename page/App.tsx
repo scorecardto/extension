@@ -43,7 +43,7 @@ function App() {
   const db = new Dexie("scorecard");
 
   db.version(1.1).stores({
-    records: "++id, date, courses, gradeCategoryNames"
+    records: "++id, date, courses, gradeCategoryNames",
   });
 
   useEffect(() => {
