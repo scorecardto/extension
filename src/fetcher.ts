@@ -2,6 +2,7 @@ import axios, { Options } from "redaxios";
 import Form from "form-data";
 import parse from "node-html-parser";
 import qs from "qs";
+import * as iso88592 from "iso-8859-2";
 
 import {
   AllContentResponse,
@@ -200,10 +201,15 @@ const fetchGradeCategoriesForCourse = async (
       "Accept-Encoding": "gzip, deflate, br",
       Accept: "*/*",
     },
+    responseType: "arrayBuffer",
   };
 
-  // @ts-ignore
-  const assignmentsResponse: string = (await axios(ASSIGNMENTS)).data;
+  const assignmentsResponseRaw = await axios(ASSIGNMENTS);
+  const assignmentsResponse = iso88592.decode(
+    new Uint8Array(assignmentsResponseRaw.data)
+  );
+
+  console.log(assignmentsResponse);
 
   const assignmentsHtml = parse(assignmentsResponse);
 
@@ -256,6 +262,9 @@ const fetchGradeCategoriesForCourse = async (
       const error: Assignment["error"] = false;
 
       const name: Assignment["name"] = elementList[nameIndex].textContent;
+      console.log(elementList[nameIndex]);
+      console.log(elementList[nameIndex].innerText);
+
       const points: Assignment["points"] = parseInt(
         elementList[gradeIndex].textContent
       );
