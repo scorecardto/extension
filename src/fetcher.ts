@@ -256,9 +256,10 @@ const fetchGradeCategoriesForCourse = async (
       const error: Assignment["error"] = false;
 
       const name: Assignment["name"] = elementList[nameIndex].textContent;
-      const grade: Assignment["grade"] = parseInt(
+      const points: Assignment["points"] = parseInt(
         elementList[gradeIndex].textContent
       );
+      const grade: Assignment["grade"] = elementList[gradeIndex].textContent;
       const dropped: Assignment["dropped"] =
         elementList[droppedIndex].textContent.trim().length !== 0;
       const assign: Assignment["assign"] = elementList[assignIndex].textContent;
@@ -277,6 +278,7 @@ const fetchGradeCategoriesForCourse = async (
       assignments.push({
         name,
         grade,
+        points,
         dropped,
         assign,
         due,
@@ -331,6 +333,8 @@ const fetchGradeCategoriesForCourse = async (
       Accept: "*/*",
     },
   };
+
+  await axios(BACK_TO_REPORT_CARD);
 
   return {
     referer: BACK_TO_REPORT_CARD.url!,
