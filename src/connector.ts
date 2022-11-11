@@ -62,7 +62,11 @@ function startExternalConnection(db: Dexie) {
         );
 
         await db.table("records").clear();
-        await addRecordToDb(db, allContent.courses, allContent.gradeCategoryNames);
+        await addRecordToDb(
+          db,
+          allContent.courses,
+          allContent.gradeCategoryNames
+        );
 
         chrome.storage.local.set({
           login: {
@@ -83,6 +87,23 @@ function startExternalConnection(db: Dexie) {
       }
     }
 
+    function sendGradingCategory() {
+      chrome.storage.local.get(["currentGradingCategory"], (res) => {
+        port.postMessage({
+          type: "setGradingCategory",
+          gradingCategory: res["currentGradingCategory"],
+        });
+      });
+    }
+
+    function sendCourseNames() {
+      chrome.storage.local.get(["courseNames"], (res) => {
+        port.postMessage({
+          type: "setCourseNames",
+          courseNames: res["courseNames"],
+        });
+      });
+    }
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -95,6 +116,15 @@ function startExternalConnection(db: Dexie) {
       if (msg.type === "requestLoginValidation") {
         sendValidPassword(msg.host, msg.username, msg.password);
       }
+
+      if (msg.type === "requestGradingCategory") {
+        sendGradingCategory();
+      }
+
+      if (msg.type === "requestCourseNames") {
+        sendCourseNames();
+      }
+
       // do nothing
     });
   });
@@ -135,7 +165,11 @@ const fetchAndStoreContent = (db: Dexie) => {
           password
         );
 
-        await addRecordToDb(db, allContent.courses, allContent.gradeCategoryNames);
+        await addRecordToDb(
+          db,
+          allContent.courses,
+          allContent.gradeCategoryNames
+        );
 
         resolve(undefined);
       } else {
