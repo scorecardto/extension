@@ -11,6 +11,7 @@
     "@types/chrome": "^0.0.193",
     "dexie": "^3.2.2",
     "form-data": "^4.0.0",
+    "framer-motion": "^7.6.6",
     "iso-8859-2": "^3.0.4",
     "node-html-parser": "^5.3.3",
     "qs": "^6.11.0",
