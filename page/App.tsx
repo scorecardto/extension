@@ -54,6 +54,8 @@ function App() {
     records: "++id, date, courses, gradeCategoryNames",
   });
 
+  window.db = db;
+
   useEffect(() => {
     if (!loading) {
       const record = db.table("records").orderBy("date").last();

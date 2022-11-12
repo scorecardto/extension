@@ -4,7 +4,11 @@ import {
   GradebookRecord,
   SetupState,
 } from "scorecard-types";
-import { addRecordToDb, fetchAllContent } from "./fetcher";
+import {
+  addRecordToDb,
+  fetchAllContent,
+  updateCourseDisplayName,
+} from "./fetcher";
 import { getLogin } from "./util";
 
 function startExternalConnection(db: Dexie) {
@@ -87,23 +91,15 @@ function startExternalConnection(db: Dexie) {
       }
     }
 
-    function sendGradingCategory() {
-      chrome.storage.local.get(["currentGradingCategory"], (res) => {
-        port.postMessage({
-          type: "setGradingCategory",
-          gradingCategory: res["currentGradingCategory"],
-        });
+    function updateCourseDisplayNameResponse(
+      courseKey: string,
+      displayName: string
+    ) {
+      updateCourseDisplayName(db, courseKey, displayName).then(() => {
+        sendCourses();
       });
     }
 
-    function sendCourseNames() {
-      chrome.storage.local.get(["courseNames"], (res) => {
-        port.postMessage({
-          type: "setCourseNames",
-          courseNames: res["courseNames"],
-        });
-      });
-    }
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -117,15 +113,9 @@ function startExternalConnection(db: Dexie) {
         sendValidPassword(msg.host, msg.username, msg.password);
       }
 
-      if (msg.type === "requestGradingCategory") {
-        sendGradingCategory();
+      if (msg.type === "updateCourseDisplayName") {
+        updateCourseDisplayNameResponse(msg.courseKey, msg.displayName);
       }
-
-      if (msg.type === "requestCourseNames") {
-        sendCourseNames();
-      }
-
-      // do nothing
     });
   });
 }

@@ -12,6 +12,7 @@ import {
   Course,
   GradeCategoriesResponse,
   CourseResponse,
+  GradebookRecord,
 } from "scorecard-types";
 import Dexie from "dexie";
 
@@ -37,7 +38,8 @@ const fetchReportCard = async (
 ): Promise<CourseResponse> => {
   // get course names from chrome storage
   const courseNamesStorage = await chrome.storage.local.get(["courseNames"]);
-  const courseNames = courseNamesStorage["courseNames"];
+  const courseNames = courseNamesStorage?.["courseNames"] || {};
+  console.log(courseNames);
 
   const cookie = generateSessionId();
 
@@ -359,6 +361,26 @@ const fetchGradeCategoriesForCourse = async (
   };
 };
 
+const updateCourseDisplayName = async (
+  db: Dexie,
+  courseKey: string,
+  displayName: string
+): Promise<boolean> => {
+  const current: GradebookRecord = await db
+    .table("records")
+    .orderBy("date")
+    .last();
+  const course = current.courses.find((c) => c.key === courseKey);
+  if (course) {
+    course.displayName = displayName;
+  } else {
+    return false;
+  }
+
+  addRecordToDb(db, current.courses, current.gradeCategoryNames);
+  return true;
+};
+
 const fetchGradeCategoriesForCourses = async (
   host: string,
   sessionId: string,
@@ -436,6 +458,7 @@ const fetchAllContent = async (
 
 export {
   fetchReportCard,
+  updateCourseDisplayName,
   fetchGradeCategoriesForCourse,
   addRecordToDb,
   fetchGradeCategoriesForCourses,
