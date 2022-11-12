@@ -35,6 +35,10 @@ const fetchReportCard = async (
   username: string,
   password: string
 ): Promise<CourseResponse> => {
+  // get course names from chrome storage
+  const courseNamesStorage = await chrome.storage.local.get(["courseNames"]);
+  const courseNames = courseNamesStorage["courseNames"];
+
   const cookie = generateSessionId();
 
   const ENTRY_POINT: Options = {
@@ -131,6 +135,8 @@ const fetchReportCard = async (
 
     const name = courseElement.textContent;
 
+    const displayName = courseNames[courseKey];
+
     const grades: Course["grades"] = [];
 
     const gradeElements = reportCardsHtml.querySelectorAll(
@@ -161,6 +167,7 @@ const fetchReportCard = async (
     });
 
     courses.push({
+      displayName,
       key: courseKey,
       name,
       grades,
