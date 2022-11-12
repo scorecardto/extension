@@ -17,7 +17,7 @@ function Courses() {
   // const gradingCategories = data.data?.gradingCategories;
 
   return (
-    <div className="mt-14 mx-3">
+    <div className="mt-14 mx-3 pb-52">
       {courses ? (
         <div>
           <div className="border border-mono-200 rounded-xl overflow-hidden">
