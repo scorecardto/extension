@@ -100,6 +100,15 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendGradingCategory() {
+      chrome.storage.local.get(["currentGradingCategory"], (res) => {
+        port.postMessage({
+          type: "setGradingCategory",
+          gradingCategory: res["currentGradingCategory"],
+        });
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -115,6 +124,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "updateCourseDisplayName") {
         updateCourseDisplayNameResponse(msg.courseKey, msg.displayName);
+      }
+
+      if (msg.type === "requestGradingCategory") {
+        sendGradingCategory();
       }
     });
   });
