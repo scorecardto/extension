@@ -28,9 +28,9 @@ function App() {
     if (data?.courses[0]) {
       const length = data.courses[0].grades.filter((g) => g).length;
 
-      if (length) {
-        setGradeCategory(Math.max(0, length - 1));
-      }
+      // if (length) {
+      //   setGradeCategory(Math.max(0, length - 1));
+      // }
 
       const TEN_MINUTES = 1000 * 60 * 10;
 
@@ -39,6 +39,14 @@ function App() {
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    chrome.storage.local.get(["currentGradingCategory"], (result) => {
+      if (result.currentGradingCategory) {
+        setGradeCategory(result.currentGradingCategory);
+      }
+    });
+  }, []);
 
   const db = new Dexie("scorecard");
 

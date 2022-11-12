@@ -27,6 +27,9 @@ export default function GradingCategorySelector(props: {
             key={index}
             highlighted={index === data.gradeCategory}
             onClick={() => {
+              chrome.storage.local.set({
+                currentGradingCategory: index,
+              });
               data.setGradeCategory(index);
               props.setEditingGradingCategory(false);
             }}
