@@ -4,11 +4,13 @@ import {
   GradebookRecord,
   SetupState,
 } from "scorecard-types";
+import { compareRecords } from "./compareRecords";
 import {
   addRecordToDb,
   fetchAllContent,
   updateCourseDisplayName,
 } from "./fetcher";
+import { addNotificationsToDb, parseMutations } from "./notifications";
 import { getLogin } from "./util";
 
 function startExternalConnection(db: Dexie) {
@@ -168,11 +170,23 @@ const fetchAndStoreContent = (db: Dexie) => {
           password
         );
 
-        await addRecordToDb(
+        const previousRecord = await db.table("records").orderBy("date").last();
+
+        const currentRecord = await addRecordToDb(
           db,
           allContent.courses,
           allContent.gradeCategoryNames
         );
+
+        const mutations = compareRecords(previousRecord, currentRecord);
+
+        console.log(mutations);
+
+        const notifications = parseMutations(mutations);
+
+        console.log(notifications);
+
+        await addNotificationsToDb(db, notifications);
 
         resolve(undefined);
       } else {

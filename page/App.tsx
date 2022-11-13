@@ -3,10 +3,10 @@ import "./App.css";
 import Main from "./components/main/Main";
 import { DataContext } from "scorecard-types";
 import { GradebookRecord } from "scorecard-types";
-import Dexie from "dexie";
 import { LoadingContext } from "scorecard-types";
 import Loading from "./components/util/context/Loading";
 import Welcome from "./components/main/Welcome";
+import { startDatabase } from "../src/database";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
@@ -48,11 +48,7 @@ function App() {
     });
   }, []);
 
-  const db = new Dexie("scorecard");
-
-  db.version(1.1).stores({
-    records: "++id, date, courses, gradeCategoryNames",
-  });
+  const db = startDatabase();
 
   useEffect(() => {
     if (!loading) {

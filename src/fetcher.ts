@@ -421,15 +421,17 @@ const addRecordToDb = (
   courses: Course[],
   gradeCategoryNames: string[]
 ) => {
-  return new Promise<void>((resolve) => {
+  return new Promise<GradebookRecord>((resolve) => {
+    const record = {
+      date: Date.now(),
+      courses: courses,
+      gradeCategoryNames: gradeCategoryNames,
+    };
+
     db.table("records")
-      .add({
-        date: Date.now(),
-        courses: courses,
-        gradeCategoryNames: gradeCategoryNames,
-      })
+      .add(record)
       .then(() => {
-        resolve();
+        resolve(record);
       });
   });
 };

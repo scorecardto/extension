@@ -1,4 +1,3 @@
-import { assert } from "console";
 import { Assignment, GradebookRecord } from "scorecard-types";
 
 interface GradebookMutation {
@@ -8,6 +7,8 @@ interface GradebookMutation {
   oldAverage?: string;
   newAverage?: string;
   grade?: string;
+  courseKey?: string;
+  courseName?: string;
 }
 
 function compareCourseLists(ref: {
@@ -72,22 +73,27 @@ function compareAssignments(ref: {
   newAssignments: Assignment[];
   oldAverage: string;
   newAverage: string;
+  courseKey: string;
+  courseName: string;
 }): GradebookMutation[] {
   const mutations: GradebookMutation[] = [];
 
-  const { oldAverage, newAverage } = ref;
+  const { oldAverage, newAverage, courseKey, courseName } = ref;
   const newAssignments = ref.newAssignments.map((a) => a.name);
 
   const oldAssignments = ref.oldAssignments.map((a) => a.name);
 
-  const added = newAssignments.filter((a) => {
+  const added = newAssignments.filter((a, idx) => {
     if (!oldAssignments.includes(a)) {
       mutations.push({
         type: "add",
         subject: "assignment",
         name: a,
+        grade: ref.newAssignments[idx].grade,
         newAverage,
         oldAverage,
+        courseKey,
+        courseName,
       });
       return true;
     }
@@ -102,6 +108,8 @@ function compareAssignments(ref: {
         name: a,
         newAverage,
         oldAverage,
+        courseKey,
+        courseName,
       });
       return true;
     }
@@ -134,6 +142,8 @@ function compareAssignments(ref: {
         grade: newAssignment.grade,
         newAverage,
         oldAverage,
+        courseKey,
+        courseName,
       });
     }
   });
@@ -146,13 +156,22 @@ function compareAssignmentCategories(ref: {
   newCategories: GradebookRecord["courses"][0]["gradeCategories"];
   oldAverage: string;
   newAverage: string;
+  courseKey: string;
+  courseName: string;
 }): GradebookMutation[] {
   const mutations: GradebookMutation[] = [];
 
   ref.oldCategories?.sort((a, b) => a.name.localeCompare(b.name));
   ref.newCategories?.sort((a, b) => a.name.localeCompare(b.name));
 
-  const { oldCategories, newCategories, oldAverage, newAverage } = ref;
+  const {
+    oldCategories,
+    newCategories,
+    oldAverage,
+    newAverage,
+    courseKey,
+    courseName,
+  } = ref;
 
   const newNames = newCategories?.map((c) => c.name) ?? [];
   const oldNames = newCategories?.map((c) => c.name) ?? [];
@@ -165,6 +184,8 @@ function compareAssignmentCategories(ref: {
         name,
         newAverage,
         oldAverage,
+        courseKey,
+        courseName,
       });
       mutations.push(
         ...compareAssignments({
@@ -172,6 +193,8 @@ function compareAssignmentCategories(ref: {
           oldAssignments: [],
           newAverage,
           oldAverage,
+          courseKey,
+          courseName,
         })
       );
       return true;
@@ -187,6 +210,8 @@ function compareAssignmentCategories(ref: {
         name,
         newAverage,
         oldAverage,
+        courseKey,
+        courseName,
       });
       mutations.push(
         ...compareAssignments({
@@ -194,6 +219,8 @@ function compareAssignmentCategories(ref: {
           oldAssignments: oldCategories?.[idx].assignments ?? [],
           newAverage,
           oldAverage,
+          courseKey,
+          courseName,
         })
       );
       return true;
@@ -231,9 +258,11 @@ function compareRecords(
     const newCourse = newCourses[i];
 
     const newAverage =
-      newCourse.grades[newCourse.grades.length - 1]?.value ?? "";
+      newCourse.grades[newCourse.grades.filter((g) => g).length - 1]?.value ??
+      "";
     const oldAverage =
-      oldCourse.grades[oldCourse.grades.length - 1]?.value ?? "";
+      oldCourse.grades[oldCourse.grades.filter((g) => g).length - 1]?.value ??
+      "";
 
     const oldCategories = oldCourse.gradeCategories;
     const newCategories = newCourse.gradeCategories;
@@ -244,6 +273,8 @@ function compareRecords(
         newCategories,
         newAverage,
         oldAverage,
+        courseKey: newCourse.key,
+        courseName: newCourse.name,
       })
     );
 
@@ -256,6 +287,8 @@ function compareRecords(
           oldAssignments: oldAssignmentCategory?.assignments ?? [],
           newAverage,
           oldAverage,
+          courseKey: newCourse.key,
+          courseName: newCourse.name,
         })
       );
     });
