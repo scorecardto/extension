@@ -182,6 +182,9 @@ const fetchAndStoreContent = (db: Dexie) => {
 
         console.log(mutations);
 
+        console.log(previousRecord);
+        console.log(currentRecord);
+
         const notifications = parseMutations(mutations);
 
         console.log(notifications);

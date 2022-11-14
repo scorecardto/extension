@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Main from "./components/main/Main";
-import { DataContext } from "scorecard-types";
+import {
+  DataContext,
+  GradebookNotification,
+  NotificationContext,
+} from "scorecard-types";
 import { GradebookRecord } from "scorecard-types";
 import { LoadingContext } from "scorecard-types";
 import Loading from "./components/util/context/Loading";
@@ -55,6 +59,10 @@ function App() {
       const record = db.table("records").orderBy("date").last();
 
       record.then(setData);
+
+      const notifications = db.table("notifications").toArray();
+
+      notifications.then(setNotifications);
     }
   }, [loading]);
 
@@ -99,21 +107,37 @@ function App() {
     });
   }, []);
 
+  const [notifications, setNotifications] = useState<GradebookNotification[]>(
+    []
+  );
+
+  const notificationContext = useMemo(
+    () => ({
+      notifications,
+      markRead: () => {
+        // TODO: mark notifications as read
+      },
+    }),
+    [notifications]
+  );
+
   return (
     <div>
       <LoadingContext.Provider value={{ loading, setLoading, reloadContent }}>
         <DataContext.Provider value={dataContext}>
-          <>
-            {(() => {
-              if (login === undefined) {
-                return <Loading />;
-              } else if (login) {
-                return <Main />;
-              } else {
-                return <Welcome />;
-              }
-            })()}
-          </>
+          <NotificationContext.Provider value={notificationContext}>
+            <>
+              {(() => {
+                if (login === undefined) {
+                  return <Loading />;
+                } else if (login) {
+                  return <Main />;
+                } else {
+                  return <Welcome />;
+                }
+              })()}
+            </>
+          </NotificationContext.Provider>
         </DataContext.Provider>
       </LoadingContext.Provider>
     </div>

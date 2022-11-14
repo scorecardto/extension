@@ -1,15 +1,7 @@
 import Dexie from "dexie";
-import { Course } from "scorecard-types";
+import { Course, GradebookNotification } from "scorecard-types";
 import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
-
-interface GradebookNotification {
-  icon: "RISE" | "FALL" | "NEUTRAL";
-  title: string;
-  message: string;
-  date: number;
-  read: boolean;
-}
 
 function parseMutations(
   mutations: GradebookMutation[]
