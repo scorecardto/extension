@@ -97,8 +97,15 @@ function startExternalConnection(db: Dexie) {
       courseKey: string,
       displayName: string
     ) {
-      updateCourseDisplayName(db, courseKey, displayName).then(() => {
-        sendCourses();
+      updateCourseDisplayName(courseKey, displayName).then(sendCourseDisplayNames);
+    }
+
+    function sendCourseDisplayNames() {
+      chrome.storage.local.get("courseDisplayNames", (res) => {
+        port.postMessage({
+          type: "setCourseDisplayNames",
+          courseDisplayNames: res["courseDisplayNames"],
+        });
       });
     }
 
@@ -126,6 +133,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "updateCourseDisplayName") {
         updateCourseDisplayNameResponse(msg.courseKey, msg.displayName);
+      }
+
+      if (msg.type === "requestCourseDisplayNames") {
+        sendCourseDisplayNames();
       }
 
       if (msg.type === "requestGradingCategory") {

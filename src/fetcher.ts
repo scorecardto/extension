@@ -36,11 +36,6 @@ const fetchReportCard = async (
   username: string,
   password: string
 ): Promise<CourseResponse> => {
-  // get course names from chrome storage
-  const courseNamesStorage = await chrome.storage.local.get(["courseNames"]);
-  const courseNames = courseNamesStorage?.["courseNames"] || {};
-  console.log(courseNames);
-
   const cookie = generateSessionId();
 
   const ENTRY_POINT: Options = {
@@ -137,8 +132,6 @@ const fetchReportCard = async (
 
     const name = courseElement.textContent;
 
-    const displayName = courseNames[courseKey];
-
     const grades: Course["grades"] = [];
 
     const gradeElements = reportCardsHtml.querySelectorAll(
@@ -169,7 +162,6 @@ const fetchReportCard = async (
     });
 
     courses.push({
-      displayName,
       key: courseKey,
       name,
       grades,
@@ -277,7 +269,8 @@ const fetchGradeCategoriesForCourse = async (
       const points: Assignment["points"] = parseInt(
         elementList[gradeIndex].textContent
       );
-      const grade: Assignment["grade"] = elementList[gradeIndex].textContent;
+
+      const grade: Assignment["grade"] = (elementList[gradeIndex].textContent.split("(")[1]?.split(")")[0].replace(/\.0?%/g, "%")) ?? elementList[gradeIndex].textContent;
       const dropped: Assignment["dropped"] =
         elementList[droppedIndex].textContent.trim().length !== 0;
       const assign: Assignment["assign"] = elementList[assignIndex].textContent;
@@ -362,22 +355,15 @@ const fetchGradeCategoriesForCourse = async (
 };
 
 const updateCourseDisplayName = async (
-  db: Dexie,
   courseKey: string,
   displayName: string
 ): Promise<boolean> => {
-  const current: GradebookRecord = await db
-    .table("records")
-    .orderBy("date")
-    .last();
-  const course = current.courses.find((c) => c.key === courseKey);
-  if (course) {
-    course.displayName = displayName;
-  } else {
-    return false;
-  }
 
-  addRecordToDb(db, current.courses, current.gradeCategoryNames);
+  const courseNames = (await chrome.storage.local.get("courseDisplayNames"))["courseDisplayNames"] ?? {};
+  courseNames[courseKey] = displayName;
+
+  await chrome.storage.local.set({ "courseDisplayNames": courseNames });
+
   return true;
 };
 
