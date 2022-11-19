@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { IoRefreshOutline } from "react-icons/io5";
-import { Course } from "scorecard-types";
+import { Course, NotificationContext } from "scorecard-types";
 import { DataContext } from "scorecard-types";
 import Loading from "../util/context/Loading";
 import { LoadingContext } from "scorecard-types";
@@ -11,13 +11,16 @@ import LastUpdated from "./LastUpdated";
 function Courses() {
   const data = useContext(DataContext);
   const loading = useContext(LoadingContext);
+  const notifications = useContext(NotificationContext);
 
   const courses: Course[] | undefined = data.data?.courses;
 
-  // const gradingCategories = data.data?.gradingCategories;
-
   return (
-    <div className="mt-14 mx-3 pb-52">
+    <div
+      className={`mt-14 mx-3 transition-all ${
+        notifications.notifications.length > 0 ? "pb-52" : "pb-0"
+      }`}
+    >
       {courses ? (
         <div>
           <div className="border border-mono-200 rounded-xl overflow-hidden">

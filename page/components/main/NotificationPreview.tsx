@@ -9,11 +9,10 @@ import Notification from "./Notification";
 import { motion } from "framer-motion";
 
 function NotificationsPreview() {
-  const [index, setIndex] = useState(0);
   const notificationContext = React.useContext(NotificationContext);
   const notifications = notificationContext.notifications;
 
-  const showingNotification = !!notifications[index];
+  const showingNotification = !!notifications[0];
 
   return (
     <div>
@@ -23,7 +22,7 @@ function NotificationsPreview() {
             return (
               <>
                 <AnimatePresence>
-                  {index === i && (
+                  {0 === i && (
                     <Notification
                       notification={notification}
                       key={i}
@@ -38,7 +37,7 @@ function NotificationsPreview() {
             <div
               className="absolute top-1/2 right-0 -translate-y-1/2 text-mono-100 bg-accent-300 hover:bg-accent-400 cursor-pointer border border-accent-400 w-8 h-8 rounded-full flex items-center justify-center"
               onClick={() => {
-                setIndex(index + 1);
+                notificationContext.markRead();
               }}
             >
               <IoChevronForwardOutline />

@@ -124,7 +124,16 @@ function App() {
     () => ({
       notifications,
       markRead: () => {
-        // TODO: mark notifications as read
+        // mark last notification as read in the database
+        const lastNotification = notifications[notifications.length - 1];
+
+        lastNotification.read = true;
+
+        db.table("notifications")
+          .update(notifications.length - 1, lastNotification)
+          .then(() => {
+            setNotifications([...notifications]);
+          });
       },
     }),
     [notifications]
