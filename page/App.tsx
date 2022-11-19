@@ -69,7 +69,11 @@ function App() {
 
       record.then(setData);
 
-      const notifications = db.table("notifications").toArray();
+      const notifications = db
+        .table("notifications")
+        .orderBy("date")
+        .reverse()
+        .toArray();
 
       notifications.then(setNotifications);
     }
@@ -125,16 +129,17 @@ function App() {
       notifications,
       markRead: () => {
         // mark last notification as read in the database
-        const lastNotification = notifications[notifications.length - 1];
+        const lastNotification = notifications[0];
 
         lastNotification.read = true;
 
         db.table("notifications")
-          .update(notifications.length - 1, lastNotification)
+          .update(lastNotification.id, lastNotification)
           .then(() => {
             setNotifications([...notifications]);
           });
       },
+      unreadNotifications: notifications.filter((n) => !n.read),
     }),
     [notifications]
   );

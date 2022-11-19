@@ -10,15 +10,15 @@ import { motion } from "framer-motion";
 
 function NotificationsPreview() {
   const notificationContext = React.useContext(NotificationContext);
-  const notifications = notificationContext.notifications;
+  const unreadNotifications = notificationContext.unreadNotifications;
 
-  const showingNotification = !!notifications[0];
+  const showingNotification = !!unreadNotifications[0];
 
   return (
     <div>
       <div>
         <div className="relative pr-4">
-          {notifications.map((notification, i) => {
+          {unreadNotifications.map((notification, i) => {
             return (
               <>
                 <AnimatePresence>

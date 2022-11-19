@@ -18,7 +18,7 @@ function Courses() {
   return (
     <div
       className={`mt-14 mx-3 transition-all ${
-        notifications.notifications.length > 0 ? "pb-52" : "pb-0"
+        notifications.unreadNotifications.length > 0 ? "pb-52" : "pb-0"
       }`}
     >
       {courses ? (
