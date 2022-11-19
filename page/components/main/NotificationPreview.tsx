@@ -1,16 +1,15 @@
 import { AnimatePresence, MotionConfig } from "framer-motion";
-import React, { useState } from "react";
-import {
-  IoCaretForwardOutline,
-  IoChevronForwardOutline,
-} from "react-icons/io5";
+import React, { useContext } from "react";
+import { IoChevronForwardOutline } from "react-icons/io5";
 import { NotificationContext } from "scorecard-types";
 import Notification from "./Notification";
 import { motion } from "framer-motion";
 
 function NotificationsPreview() {
-  const notificationContext = React.useContext(NotificationContext);
-  const unreadNotifications = notificationContext.unreadNotifications;
+  const notificationContext = useContext(NotificationContext);
+  const { notifications, unreadNotifications } = notificationContext;
+
+  const currentNotificationId = unreadNotifications[0]?.id;
 
   const showingNotification = !!unreadNotifications[0];
 
@@ -18,11 +17,11 @@ function NotificationsPreview() {
     <div>
       <div>
         <div className="relative pr-4">
-          {unreadNotifications.map((notification, i) => {
+          {notifications.map((notification, i) => {
             return (
               <>
                 <AnimatePresence>
-                  {0 === i && (
+                  {currentNotificationId === notification.id && (
                     <Notification
                       notification={notification}
                       key={i}
