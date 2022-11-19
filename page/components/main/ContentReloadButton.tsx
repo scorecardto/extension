@@ -9,7 +9,7 @@ export default function ContentReloadButton(props: { lastUpdated: number }) {
   return (
     <div className="flex justify-center pt-2">
       {loadingContext.loading ? (
-        <div className="text-xs text-mono-400 flex flex-row gap-1 items-center group cursor-pointer w-fit">
+        <div className="text-xs text-mono-400 flex flex-row gap-1 items-center group w-fit">
           Loading
         </div>
       ) : (

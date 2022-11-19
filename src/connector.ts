@@ -13,6 +13,8 @@ import {
 import { addNotificationsToDb, parseMutations } from "./notifications";
 import { getLogin } from "./util";
 
+let currentlyFetching = false;
+
 function startExternalConnection(db: Dexie) {
   chrome.runtime.onConnectExternal.addListener((port) => {
     port.postMessage({ type: "handshake", version: 0.1 });
@@ -97,7 +99,9 @@ function startExternalConnection(db: Dexie) {
       courseKey: string,
       displayName: string
     ) {
-      updateCourseDisplayName(courseKey, displayName).then(sendCourseDisplayNames);
+      updateCourseDisplayName(courseKey, displayName).then(
+        sendCourseDisplayNames
+      );
     }
 
     function sendCourseDisplayNames() {
@@ -148,6 +152,9 @@ function startExternalConnection(db: Dexie) {
 
 function startInternalConnection(db: Dexie) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "getLoadingState") {
+      sendResponse(currentlyFetching);
+    }
     if (request.type === "requestContentReload") {
       fetchAndStoreContent(db).then((result) => {
         chrome.runtime.sendMessage(
@@ -167,6 +174,13 @@ function startInternalConnection(db: Dexie) {
 
 const fetchAndStoreContent = (db: Dexie) => {
   return new Promise<string | undefined>((resolve) => {
+    if (currentlyFetching) {
+      console.log("Already fetching");
+
+      resolve("ALREADY_FETCHING");
+      return;
+    }
+
     chrome.storage.local.get(["login"], async (res) => {
       if (res["login"]) {
         const login = res["login"];
@@ -175,11 +189,15 @@ const fetchAndStoreContent = (db: Dexie) => {
         const username = login.username;
         const password = login.password;
 
+        currentlyFetching = true;
+
         const allContent: AllContentResponse = await fetchAllContent(
           host,
           username,
           password
         );
+
+        currentlyFetching = false;
 
         const previousRecord = await db.table("records").orderBy("date").last();
 
@@ -191,14 +209,7 @@ const fetchAndStoreContent = (db: Dexie) => {
 
         const mutations = compareRecords(previousRecord, currentRecord);
 
-        console.log(mutations);
-
-        console.log(previousRecord);
-        console.log(currentRecord);
-
         const notifications = parseMutations(mutations);
-
-        console.log(notifications);
 
         await addNotificationsToDb(db, notifications);
 

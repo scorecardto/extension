@@ -50,6 +50,15 @@ function App() {
         setGradeCategory(result.currentGradingCategory);
       }
     });
+
+    chrome.runtime.sendMessage(
+      {
+        type: "getLoadingState",
+      },
+      (response) => {
+        setLoading(response);
+      }
+    );
   }, []);
 
   const db = startDatabase();

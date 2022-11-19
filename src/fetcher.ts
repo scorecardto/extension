@@ -263,14 +263,16 @@ const fetchGradeCategoriesForCourse = async (
       const error: Assignment["error"] = false;
 
       const name: Assignment["name"] = elementList[nameIndex].textContent;
-      console.log(elementList[nameIndex]);
-      console.log(elementList[nameIndex].innerText);
 
       const points: Assignment["points"] = parseInt(
         elementList[gradeIndex].textContent
       );
 
-      const grade: Assignment["grade"] = (elementList[gradeIndex].textContent.split("(")[1]?.split(")")[0].replace(/\.0?%/g, "%")) ?? elementList[gradeIndex].textContent;
+      const grade: Assignment["grade"] =
+        elementList[gradeIndex].textContent
+          .split("(")[1]
+          ?.split(")")[0]
+          .replace(/\.0?%/g, "%") ?? elementList[gradeIndex].textContent;
       const dropped: Assignment["dropped"] =
         elementList[droppedIndex].textContent.trim().length !== 0;
       const assign: Assignment["assign"] = elementList[assignIndex].textContent;
@@ -358,11 +360,13 @@ const updateCourseDisplayName = async (
   courseKey: string,
   displayName: string
 ): Promise<boolean> => {
-
-  const courseNames = (await chrome.storage.local.get("courseDisplayNames"))["courseDisplayNames"] ?? {};
+  const courseNames =
+    (await chrome.storage.local.get("courseDisplayNames"))[
+      "courseDisplayNames"
+    ] ?? {};
   courseNames[courseKey] = displayName;
 
-  await chrome.storage.local.set({ "courseDisplayNames": courseNames });
+  await chrome.storage.local.set({ courseDisplayNames: courseNames });
 
   return true;
 };
