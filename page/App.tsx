@@ -129,7 +129,7 @@ function App() {
       notifications,
       markRead: () => {
         // mark last notification as read in the database
-        const lastNotification = notifications[0];
+        const lastNotification = notifications.filter((n) => !n.read)[0];
 
         lastNotification.read = true;
 
