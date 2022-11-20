@@ -70,9 +70,8 @@ function startExternalConnection(db: Dexie) {
           password
         );
 
-        const gradeCategory = allContent.courses[0].grades.filter(
-          (g) => g
-        ).length;
+        const gradeCategory =
+          allContent.courses[0].grades.filter((g) => g).length - 1;
 
         await db.table("records").clear();
 
@@ -221,8 +220,6 @@ export const fetchAndStoreContent = (db: Dexie) => {
     notifications?: GradebookNotification[];
   }>((resolve) => {
     if (currentlyFetching) {
-      console.log("Already fetching");
-
       resolve({ result: "ALREADY_FETCHING" });
       return;
     }
@@ -247,9 +244,12 @@ export const fetchAndStoreContent = (db: Dexie) => {
 
         const previousRecord = await db.table("records").orderBy("date").last();
 
-        const gradeCategory = allContent.courses[0].grades.filter(
-          (g) => g
-        ).length;
+        const gradeCategory =
+          allContent.courses[0].grades.filter((g) => g).length - 1;
+
+        await chrome.storage.local.set({
+          currentGradingCategory: gradeCategory,
+        });
 
         const currentRecord = await addRecordToDb(
           db,
