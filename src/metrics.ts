@@ -1,9 +1,12 @@
-import axios from "axios";
+import axios from "redaxios";
 import { UAParser } from "ua-parser-js";
 
 const DOMAIN = "https://scorecard-iota.vercel.app";
 
-export async function handleInstall(installDate: Date) {
+export async function handleInstall(
+  installDate: Date,
+  extensionVersion: string
+) {
   const uaParser = new UAParser();
   const browser = uaParser.getBrowser();
   const os = uaParser.getOS();
@@ -11,11 +14,12 @@ export async function handleInstall(installDate: Date) {
   const engine = uaParser.getEngine();
 
   const res = await axios.post(`${DOMAIN}/api/metrics/install`, {
-    installDate: installDate.getTime(),
-    browser: browser,
-    os: os,
-    device: device,
-    engine: engine,
+    installDate,
+    extensionVersion,
+    browser,
+    os,
+    device,
+    engine,
   });
 
   const clientId = res.data["clientId"];
