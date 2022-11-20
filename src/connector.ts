@@ -13,6 +13,7 @@ import {
 } from "./fetcher";
 import { addNotificationsToDb, parseMutations } from "./notifications";
 import { getLogin } from "./util";
+import { data } from "autoprefixer";
 
 let currentlyFetching = false;
 

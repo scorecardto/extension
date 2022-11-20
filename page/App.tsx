@@ -15,6 +15,7 @@ import { startDatabase } from "../src/database";
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
   const [gradeCategory, setGradeCategory] = useState<number>(0);
+  const [courseDisplayNames, setCourseDisplayNames] = useState<{[key: string]: string;}>({});
 
   const dataContext = useMemo(
     () => ({
@@ -22,8 +23,10 @@ function App() {
       setData,
       gradeCategory,
       setGradeCategory,
+      courseDisplayNames,
+      setCourseDisplayNames
     }),
-    [data, gradeCategory, setGradeCategory]
+    [data, gradeCategory, setGradeCategory, courseDisplayNames, setCourseDisplayNames]
   );
 
   const [loading, setLoading] = useState(false);
@@ -45,9 +48,12 @@ function App() {
   }, [data]);
 
   useEffect(() => {
-    chrome.storage.local.get(["currentGradingCategory"], (result) => {
+    chrome.storage.local.get(["currentGradingCategory", "courseDisplayNames"], (result) => {
       if (result.currentGradingCategory) {
         setGradeCategory(result.currentGradingCategory);
+      }
+      if (result.courseDisplayNames) {
+        setCourseDisplayNames(result.courseDisplayNames);
       }
     });
 
