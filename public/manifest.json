@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "manifest_version": 3,
   "description": "Scorecard: Free Gradebook Viewer for Frontline with Grade Testing, History, and GPA.",
-  "homepage_url": "https://scorecard.to",
+  "homepage_url": "https://scorecardgrades.com",
   "action": {
     "default_popup": "page/index.html"
   },
   "background": {
-    "service_worker": "src/background.js",
+    "service_worker": "src/worker.js",
     "type": "module"
   },
-  "permissions": ["storage", "webRequest", "scripting"],
+  "permissions": ["storage", "webRequest", "scripting", "alarms"],
   "externally_connectable": {
     "matches": [
       "https://scorecard-iota.vercel.app/*",

@@ -250,6 +250,12 @@ const fetchAndStoreContent = (db: Dexie) => {
 
         await addNotificationsToDb(db, notifications);
 
+        const length = currentRecord.courses[0].grades.filter((g) => g).length;
+
+        if (length) {
+          setGradingPeriod(Math.max(0, length - 1));
+        }
+
         resolve(undefined);
       } else {
         resolve("LOGIN_NOT_FOUND");

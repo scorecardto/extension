@@ -9,7 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(__dirname, "./page/index.html"),
-        background: resolve(__dirname, "./src/background.ts"),
+        worker: resolve(__dirname, "./src/worker.ts"),
       },
       output: {
         entryFileNames: "src/[name].js",
