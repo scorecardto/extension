@@ -364,7 +364,12 @@ const updateCourseDisplayName = async (
     (await chrome.storage.local.get("courseDisplayNames"))[
       "courseDisplayNames"
     ] ?? {};
-  courseNames[courseKey] = displayName;
+
+  if (displayName === "") {
+    delete courseNames[courseKey];
+  } else {
+    courseNames[courseKey] = displayName;
+  }
 
   await chrome.storage.local.set({ courseDisplayNames: courseNames });
 
