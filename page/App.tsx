@@ -147,8 +147,8 @@ function App() {
   return (
     <div>
       <LoadingContext.Provider value={{ loading, setLoading, reloadContent }}>
-        <DataContext.Provider value={dataContext}>
-          <NotificationContext.Provider value={notificationContext}>
+        <NotificationContext.Provider value={notificationContext}>
+          <DataContext.Provider value={dataContext}>
             <>
               {(() => {
                 if (login === undefined) {
@@ -160,8 +160,8 @@ function App() {
                 }
               })()}
             </>
-          </NotificationContext.Provider>
-        </DataContext.Provider>
+          </DataContext.Provider>
+        </NotificationContext.Provider>
       </LoadingContext.Provider>
     </div>
   );

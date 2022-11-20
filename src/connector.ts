@@ -1,6 +1,7 @@
 import Dexie from "dexie";
 import {
   AllContentResponse,
+  GradebookNotification,
   GradebookRecord,
   SetupState,
 } from "scorecard-types";
@@ -122,6 +123,34 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendNotifications() {
+      db.table("notifications")
+        .orderBy("date")
+        .reverse()
+        .toArray()
+        .then((notifications) => {
+          port.postMessage({
+            type: "setNotifications",
+            notifications,
+          });
+        });
+    }
+
+    async function markNotificationAsRead() {
+      const notifications = db.table("notifications");
+
+      const lastNotification: GradebookNotification = await notifications
+        .orderBy("date")
+        .filter((notification) => !notification.read)
+        .last();
+
+      if (lastNotification) {
+        notifications.update(lastNotification.id, {
+          read: true,
+        });
+      }
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -145,6 +174,14 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "requestGradingCategory") {
         sendGradingCategory();
+      }
+
+      if (msg.type === "requestNotifications") {
+        sendNotifications();
+      }
+
+      if (msg.type === "markNotificationAsRead") {
+        markNotificationAsRead();
       }
     });
   });

@@ -11,7 +11,7 @@ function Notification(props: {
   const { icon, title, message } = props.notification;
   return (
     <motion.div
-      key={`course-${props.index}`}
+      key={`notification-${props.index}`}
       initial={
         props.index === 0
           ? {}
