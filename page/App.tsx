@@ -133,6 +133,7 @@ function App() {
   const notificationContext = useMemo(
     () => ({
       notifications,
+      setNotifications,
       markRead: () => {
         // mark last notification as read in the database
         const lastNotification = notifications.filter((n) => !n.read)[0];
