@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     if (data?.courses[0]) {
-      const length = data.courses[0].grades.filter((g) => g).length;
+      // const length = data.courses[0].grades.filter((g) => g).length;
 
       // if (length) {
       //   setGradeCategory(Math.max(0, length - 1));
