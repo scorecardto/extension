@@ -70,11 +70,17 @@ function startExternalConnection(db: Dexie) {
           password
         );
 
+        const gradeCategory = allContent.courses[0].grades.filter(
+          (g) => g
+        ).length;
+
         await db.table("records").clear();
+
         await addRecordToDb(
           db,
           allContent.courses,
-          allContent.gradeCategoryNames
+          allContent.gradeCategoryNames,
+          gradeCategory
         );
 
         chrome.storage.local.set({
@@ -118,7 +124,7 @@ function startExternalConnection(db: Dexie) {
       chrome.storage.local.get(["currentGradingCategory"], (res) => {
         port.postMessage({
           type: "setGradingCategory",
-          gradingCategory: res["currentGradingCategory"],
+          gradeCategory: res["currentGradingCategory"],
         });
       });
     }
@@ -197,7 +203,7 @@ function startInternalConnection(db: Dexie) {
         chrome.runtime.sendMessage(
           {
             type: "requestContentReloadResponse",
-            result: result || "SUCCESS",
+            result: result.result || "SUCCESS",
           },
           () => {
             // do nothing
@@ -209,12 +215,15 @@ function startInternalConnection(db: Dexie) {
   });
 }
 
-const fetchAndStoreContent = (db: Dexie) => {
-  return new Promise<string | undefined>((resolve) => {
+export const fetchAndStoreContent = (db: Dexie) => {
+  return new Promise<{
+    result?: string;
+    notifications?: GradebookNotification[];
+  }>((resolve) => {
     if (currentlyFetching) {
       console.log("Already fetching");
 
-      resolve("ALREADY_FETCHING");
+      resolve({ result: "ALREADY_FETCHING" });
       return;
     }
 
@@ -238,10 +247,15 @@ const fetchAndStoreContent = (db: Dexie) => {
 
         const previousRecord = await db.table("records").orderBy("date").last();
 
+        const gradeCategory = allContent.courses[0].grades.filter(
+          (g) => g
+        ).length;
+
         const currentRecord = await addRecordToDb(
           db,
           allContent.courses,
-          allContent.gradeCategoryNames
+          allContent.gradeCategoryNames,
+          gradeCategory
         );
 
         const mutations = compareRecords(previousRecord, currentRecord);
@@ -250,15 +264,9 @@ const fetchAndStoreContent = (db: Dexie) => {
 
         await addNotificationsToDb(db, notifications);
 
-        const length = currentRecord.courses[0].grades.filter((g) => g).length;
-
-        if (length) {
-          setGradingPeriod(Math.max(0, length - 1));
-        }
-
-        resolve(undefined);
+        resolve({ result: "SUCCESS", notifications });
       } else {
-        resolve("LOGIN_NOT_FOUND");
+        resolve({ result: "LOGIN_NOT_FOUND" });
       }
     });
   });

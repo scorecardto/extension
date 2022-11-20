@@ -409,13 +409,15 @@ const fetchGradeCategoriesForCourses = async (
 const addRecordToDb = (
   db: Dexie,
   courses: Course[],
-  gradeCategoryNames: string[]
+  gradeCategoryNames: string[],
+  gradeCategory: number
 ) => {
   return new Promise<GradebookRecord>((resolve) => {
     const record = {
       date: Date.now(),
       courses: courses,
       gradeCategoryNames: gradeCategoryNames,
+      gradeCategory: gradeCategory,
     };
 
     db.table("records")

@@ -1,3 +1,4 @@
+import { startBackgroundSync } from "./backgroundSync";
 import { startExternalConnection, startInternalConnection } from "./connector";
 import { startDatabase } from "./database";
 import { handleUninstall } from "./metrics";
@@ -7,6 +8,8 @@ const database = startDatabase();
 
 startInternalConnection(database);
 startExternalConnection(database);
-handleUninstall();
 
+handleUninstall();
 versionManager();
+
+startBackgroundSync(database);

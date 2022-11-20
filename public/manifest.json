@@ -11,7 +11,13 @@
     "service_worker": "src/worker.js",
     "type": "module"
   },
-  "permissions": ["storage", "webRequest", "scripting", "alarms"],
+  "permissions": [
+    "storage",
+    "webRequest",
+    "scripting",
+    "alarms",
+    "notifications"
+  ],
   "externally_connectable": {
     "matches": [
       "https://scorecard-iota.vercel.app/*",
