@@ -11,7 +11,7 @@ export default function GradingCategorySelector(props: {
 
   const { editingGradingCategory, setEditingGradingCategory } = props;
 
-  const ref = useRef<HTMLDivElement>();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: any) => {
@@ -29,12 +29,11 @@ export default function GradingCategorySelector(props: {
       animate={{
         width: editingGradingCategory ? "50%" : "0%",
       }}
-      ref={ref}
       transition={{
         duration: 0.3,
       }}
     >
-      <div className="pl-4 py-4 flex flex-col gap-2">
+      <div className="pl-4 py-4 flex flex-col gap-2" ref={ref}>
         {data.data?.gradeCategoryNames.map((name, index) => (
           <Chip
             rightAlign={true}
