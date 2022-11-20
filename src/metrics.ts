@@ -26,3 +26,17 @@ export async function handleInstall(
 
   return clientId;
 }
+
+export async function handleUninstall() {
+  chrome.storage.local.get(["clientId"], async (res) => {
+    const clientId = res["clientId"];
+
+    let url = `${DOMAIN}/uninstall?loginStorage=local&gradeStorage=local`;
+
+    if (clientId) {
+      url += `&clientId=${clientId}`;
+    }
+
+    chrome.runtime.setUninstallURL(url);
+  });
+}

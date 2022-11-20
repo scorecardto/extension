@@ -1,4 +1,4 @@
-import { handleInstall } from "./metrics";
+import { handleInstall, handleUninstall } from "./metrics";
 
 const WELCOME_URL = "https://scorecard-iota.vercel.app/app/connect-account";
 const CURRENT_VERSION = chrome.runtime.getManifest().version;
@@ -20,7 +20,9 @@ export default function versionManager() {
 
       handleInstall(new Date(), CURRENT_VERSION)
         .then((clientId) => {
-          chrome.storage.local.set({ clientId: clientId });
+          chrome.storage.local.set({ clientId: clientId }).then(() => {
+            handleUninstall();
+          });
         })
         .catch((err) => {
           console.log("Error occured while creating clientId", err);

@@ -39,7 +39,7 @@ function NotificationsPreview() {
                 notificationContext.markRead();
               }}
             >
-              <IoChevronForwardOutline className="" />
+              <IoChevronForwardOutline className="text-white" />
             </div>
           )}
         </div>
