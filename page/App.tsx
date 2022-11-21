@@ -138,13 +138,25 @@ function App() {
         // mark last notification as read in the database
         const lastNotification = notifications.filter((n) => !n.read)[0];
 
-        lastNotification.read = true;
+        chrome.storage.local.get("settings").then((res) => {
+          const time = res.settings?.deleteNotificationsAfter;
 
-        db.table("notifications")
-          .update(lastNotification.id, lastNotification)
-          .then(() => {
-            setNotifications([...notifications]);
-          });
+          if (time !== undefined && Date.now() - lastNotification.date >= time * 24 * 60 * 60 * 1000) {
+            db.table("notifications")
+              .delete(lastNotification.id)
+              .then(() => {
+                setNotifications([...notifications]);
+              })
+          } else {
+            lastNotification.read = true;
+
+            db.table("notifications")
+              .update(lastNotification.id, lastNotification)
+              .then(() => {
+                setNotifications([...notifications]);
+              });
+          }
+        });
       },
       unreadNotifications: notifications.filter((n) => !n.read),
     }),

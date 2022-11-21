@@ -271,6 +271,7 @@ export const fetchAndStoreContent = (db: Dexie) => {
 
         currentlyFetching = true;
 
+        console.log("fetching all");
         const allContent: AllContentResponse = await fetchAllContent(
           host,
           username,
