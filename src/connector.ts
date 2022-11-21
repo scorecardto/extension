@@ -3,6 +3,7 @@ import {
   AllContentResponse,
   GradebookNotification,
   GradebookRecord,
+  Settings,
   SetupState,
 } from "scorecard-types";
 import { compareRecords } from "./compareRecords";
@@ -13,7 +14,6 @@ import {
 } from "./fetcher";
 import { addNotificationsToDb, parseMutations } from "./notifications";
 import { getLogin } from "./util";
-import { data } from "autoprefixer";
 
 let currentlyFetching = false;
 
@@ -157,6 +157,34 @@ function startExternalConnection(db: Dexie) {
       }
     }
 
+    function sendSettings() {
+      chrome.storage.local.get(["settings"], (res) => {
+        port.postMessage({
+          type: "setSettings",
+          settings: res["settings"],
+        });
+      });
+    }
+
+    function setSettings(settings: Settings) {
+      chrome.storage.local
+        .set({
+          settings,
+        })
+        .then(() => {
+          port.postMessage({
+            type: "setSettingsResponse",
+            result: "SUCCESS",
+          });
+        })
+        .catch(() => {
+          port.postMessage({
+            type: "setSettingsResponse",
+            result: "ERROR",
+          });
+        });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -188,6 +216,14 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "markNotificationAsRead") {
         markNotificationAsRead();
+      }
+
+      if (msg.type === "requestSettings") {
+        sendSettings();
+      }
+
+      if (msg.type === "setSettings") {
+        setSettings(msg.settings);
       }
     });
   });
