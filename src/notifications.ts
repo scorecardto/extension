@@ -1,4 +1,4 @@
-import Dexie from "dexie";
+import Dexie, { IndexableType } from "dexie";
 import { Course, GradebookNotification } from "scorecard-types";
 import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
@@ -167,11 +167,25 @@ function addNotificationsToDb(
   notifications: GradebookNotification[]
 ) {
   return new Promise<void>((resolve) => {
-    db.table("notifications")
-      .bulkAdd(notifications)
-      .then(() => {
-        resolve();
-      });
+    chrome.storage.local.get("settings").then((res) => {
+      const time = res.settings?.deleteNotificationsAfter;
+
+      db.table("notifications")
+        .bulkAdd(notifications)
+        .then(() => {
+          db.transaction("rw", "notifications", () => {
+            db.table("notifications")
+              .each((notification: GradebookNotification) => {
+                if (time !== undefined && notification.read && Date.now() - notification.date >= time * 24 * 60 * 60 * 1000) {
+                  db.table("notifications").delete(notification.id as IndexableType);
+                }
+              })
+              .then(() => {
+                resolve();
+              });
+          });
+        });
+    });
   });
 }
 
