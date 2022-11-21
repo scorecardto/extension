@@ -2,6 +2,7 @@ import { startBackgroundSync } from "./backgroundSync";
 import { startExternalConnection, startInternalConnection } from "./connector";
 import { startDatabase } from "./database";
 import { handleUninstall } from "./metrics";
+import { checkSettings } from "./settings";
 import versionManager from "./versionManager";
 
 const database = startDatabase();
@@ -13,3 +14,5 @@ handleUninstall();
 versionManager();
 
 startBackgroundSync(database);
+
+checkSettings();
