@@ -11,6 +11,7 @@ import { LoadingContext } from "scorecard-types";
 import Loading from "./components/util/context/Loading";
 import Welcome from "./components/main/Welcome";
 import { startDatabase } from "../src/database";
+import { IndexableType } from "dexie";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
@@ -143,7 +144,7 @@ function App() {
 
           if (time !== undefined && Date.now() - lastNotification.date >= time * 24 * 60 * 60 * 1000) {
             db.table("notifications")
-              .delete(lastNotification.id)
+              .delete(lastNotification.id as IndexableType)
               .then(() => {
                 setNotifications([...notifications]);
               })

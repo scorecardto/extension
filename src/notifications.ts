@@ -1,4 +1,4 @@
-import Dexie from "dexie";
+import Dexie, { IndexableType } from "dexie";
 import { Course, GradebookNotification } from "scorecard-types";
 import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
@@ -177,7 +177,7 @@ function addNotificationsToDb(
             db.table("notifications")
               .each((notification: GradebookNotification) => {
                 if (time !== undefined && notification.read && Date.now() - notification.date >= time * 24 * 60 * 60 * 1000) {
-                  db.table("notifications").delete(notification.id);
+                  db.table("notifications").delete(notification.id as IndexableType);
                 }
               })
               .then(() => {
