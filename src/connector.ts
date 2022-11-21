@@ -185,6 +185,25 @@ function startExternalConnection(db: Dexie) {
         });
     }
 
+    function enableNotifications() {
+      // modify settings in storage
+      chrome.storage.local.get(["settings"], (res) => {
+        const settings = res["settings"] ?? {};
+        settings.usePushNotifications = true;
+        chrome.storage.local.set({
+          settings,
+        });
+      });
+
+      // push a notification
+      chrome.notifications.create({
+        type: "basic",
+        iconUrl: chrome.runtime.getURL("assets/icons/lg.png"),
+        title: "Notifications Appear Here",
+        message: "Thanks for chosing Scorecard, the free gradebook viewer.",
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -224,6 +243,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "setSettings") {
         setSettings(msg.settings);
+      }
+
+      if (msg.type === "enableNotifications") {
+        enableNotifications();
       }
     });
   });
