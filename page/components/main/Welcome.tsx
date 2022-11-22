@@ -1,4 +1,5 @@
 import React from "react";
+import { getDomain } from "../../../src/domain";
 
 function Welcome() {
   return (
@@ -13,9 +14,17 @@ function Welcome() {
           <p>{"Thanks for installing! Let's get you set up."}</p>
         </div>
         <div className="h-full flex justify-center items-center pb-12">
-          <div className="from-accent-500 to-accent-600 bg-gradient-to-tr text-white rounded-md py-2 px-4 text-base">
-            Get started
-          </div>
+          <a
+            href={`
+    ${getDomain()}/app/connect-account?hidden-action=setup
+    `}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="bg-accent-400 text-white rounded-md py-2 px-4 text-base">
+              Get Started
+            </div>
+          </a>
         </div>
       </div>
     </div>

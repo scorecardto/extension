@@ -7,6 +7,7 @@ import {
   SetupState,
 } from "scorecard-types";
 import { compareRecords } from "./compareRecords";
+import { getDomain } from "./domain";
 import {
   addRecordToDb,
   fetchAllContent,
@@ -75,6 +76,10 @@ function startExternalConnection(db: Dexie) {
 
         const gradeCategory =
           allContent.courses[0].grades.filter((g) => g).length - 1;
+
+        await chrome.storage.local.set({
+          currentGradingCategory: gradeCategory,
+        });
 
         await db.table("records").clear();
 
@@ -255,6 +260,20 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function addBookmark() {
+      chrome.bookmarks.getTree((tree) => {
+        const bookmarksBar = tree[0].children?.find(
+          (child) => child.title === "Bookmarks Bar"
+        );
+
+        chrome.bookmarks.create({
+          parentId: bookmarksBar?.id,
+          title: "Scorecard",
+          url: `${getDomain()}/app`,
+        });
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -302,6 +321,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "requestAlternateGradingPeriod") {
         sendAlternateGradingPeriod(msg.courseKey, msg.gradeCategory);
+      }
+
+      if (msg.type === "addBookmark") {
+        addBookmark();
       }
     });
   });

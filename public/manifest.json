@@ -16,7 +16,8 @@
     "webRequest",
     "scripting",
     "alarms",
-    "notifications"
+    "notifications",
+    "bookmarks"
   ],
   "externally_connectable": {
     "matches": ["https://scorecardgrades.com/*", "http://localhost:4999/*"]
