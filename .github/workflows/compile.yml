@@ -30,6 +30,7 @@ jobs:
           filename: "release.zip"
           exclusions: "*.git* /*node_modules/* .editorconfig"
       - uses: Klemensas/action-autotag@stable
+        id: tag
         name: Create tag
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -37,3 +38,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "release.zip"
+          tag: "${{ steps.tag.outputs.tagname }}"
