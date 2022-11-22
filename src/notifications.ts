@@ -13,6 +13,17 @@ function parseMutations(
   const courseMutations: Record<string, GradebookMutation[]> = {};
   const newRemovedCourseNotifications: Record<string, GradebookMutation[]> = {};
 
+  chrome.storage.local.get(["coursesLastUpdated"], (res) => {
+    const coursesLastUpdated = res.coursesLastUpdated || {};
+
+    mutations.forEach((mutation) => {
+      if (mutation.courseKey) {
+        coursesLastUpdated[mutation.courseKey] = Date.now();
+      }
+    });
+
+    chrome.storage.local.set({ coursesLastUpdated });
+  });
   mutations.forEach((mutation) => {
     if (mutation.courseKey) {
       if (!courseMutations[mutation.courseKey]) {

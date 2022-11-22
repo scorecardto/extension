@@ -291,6 +291,17 @@ function startExternalConnection(db: Dexie) {
         loading: currentlyFetching,
       });
     }
+
+    function sendCoursesLastUpdated() {
+      chrome.storage.local.get(["coursesLastUpdated"], (res) => {
+        const lastUpdated = res["coursesLastUpdated"] ?? {};
+        port.postMessage({
+          type: "setCoursesLastUpdated",
+          lastUpdated,
+        });
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -350,6 +361,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "requestLoadingState") {
         sendLoadingState();
+      }
+
+      if (msg.type === "requestCoursesLastUpdated") {
+        sendCoursesLastUpdated();
       }
     });
   });
