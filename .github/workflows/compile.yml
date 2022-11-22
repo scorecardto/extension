@@ -34,6 +34,7 @@ jobs:
         name: Create tag
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - run: echo ${{steps.tag}}
       - name: Release Archive
         uses: ncipollo/release-action@v1
         with:
