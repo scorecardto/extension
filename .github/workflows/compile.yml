@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm run build --if-present- name: Archive Release
+      - run: npm run build --if-present
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          path: 'dist'
-          filename: 'release.zip'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
+          type: "zip"
+          path: "dist"
+          filename: "release.zip"
+          exclusions: "*.git* /*node_modules/* .editorconfig"
