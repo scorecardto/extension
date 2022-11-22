@@ -1,7 +1,7 @@
+import { getDomain } from "./domain";
 import { handleInstall, handleUninstall } from "./metrics";
 
-const WELCOME_URL =
-  "https://scorecardgrades.com/app/connect-account?hidden-action=setup";
+const WELCOME_URL = `${getDomain()}/app/connect-account?hidden-action=setup`;
 const CURRENT_VERSION = chrome.runtime.getManifest().version;
 
 function storeVersion(version: string) {

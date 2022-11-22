@@ -1,9 +1,10 @@
-import { AnimatePresence, MotionConfig } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import React, { useContext } from "react";
 import { IoChevronForwardOutline } from "react-icons/io5";
 import { NotificationContext } from "scorecard-types";
 import Notification from "./Notification";
 import { motion } from "framer-motion";
+import { getDomain } from "../../../src/domain";
 
 function NotificationsPreview() {
   const notificationContext = useContext(NotificationContext);
@@ -45,7 +46,7 @@ function NotificationsPreview() {
         </div>
         <div className="px-8">
           <motion.div
-            className="text-center bg-mono-150 border-b border-x border-mono-200 flex items-center text-mono-400"
+            className="cursor-pointer text-center bg-mono-150 hover:bg-mono-175 border-b border-x border-mono-200 flex items-center text-mono-400"
             variants={{
               showingNotification: {
                 width: "100%",
@@ -74,7 +75,7 @@ function NotificationsPreview() {
           >
             {!showingNotification && (
               <a
-                href="https://scorecardgrades.com/app/notifications"
+                href={`${getDomain()}/app/notifications`}
                 target="_blank"
                 className="w-full"
                 rel="noreferrer"

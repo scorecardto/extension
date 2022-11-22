@@ -1,7 +1,6 @@
 import axios from "redaxios";
 import { UAParser } from "ua-parser-js";
-
-const DOMAIN = "https://scorecardgrades.com";
+import { getDomain } from "./domain";
 
 export async function handleInstall(
   installDate: Date,
@@ -13,7 +12,7 @@ export async function handleInstall(
   const device = uaParser.getDevice();
   const engine = uaParser.getEngine();
 
-  const res = await axios.post(`${DOMAIN}/api/metrics/install`, {
+  const res = await axios.post(`${getDomain()}/api/metrics/install`, {
     installDate,
     extensionVersion,
     browser,
@@ -31,7 +30,7 @@ export async function handleUninstall() {
   chrome.storage.local.get(["clientId"], async (res) => {
     const clientId = res["clientId"];
 
-    let url = `${DOMAIN}/uninstall?loginStorage=local&gradeStorage=local`;
+    let url = `${getDomain()}/uninstall?loginStorage=local&gradeStorage=local`;
 
     if (clientId) {
       url += `&clientId=${clientId}`;
