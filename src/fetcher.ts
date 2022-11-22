@@ -182,6 +182,8 @@ const fetchGradeCategoriesForCourse = async (
   referer: string,
   course: Course
 ): Promise<GradeCategoriesResponse> => {
+  console.log(course.key);
+  // sectionIndex=2,gradeTypeIndex=1st 9 Weeks,courseIndex=2545.P000.Y,calendarIndex=1,gradeIndex=98,teacherIndex=Torres^ Rosa,dayCodeIndex=A - 02,locIndex=018
   const ASSIGNMENTS: Options = {
     url: `https://${host}/selfserve/PSSViewGradeBookEntriesAction.do?x-tab-id=undefined`,
     method: "POST",
@@ -204,6 +206,8 @@ const fetchGradeCategoriesForCourse = async (
     },
     responseType: "arrayBuffer",
   };
+
+  console.log(referer, sessionId);
 
   const assignmentsResponseRaw = await axios(ASSIGNMENTS);
   const assignmentsResponse = iso88592.decode(
@@ -418,7 +422,7 @@ const addRecordToDb = (
   gradeCategory: number
 ) => {
   return new Promise<GradebookRecord>((resolve) => {
-    const record = {
+    const record: GradebookRecord = {
       date: Date.now(),
       courses: courses,
       gradeCategoryNames: gradeCategoryNames,

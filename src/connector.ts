@@ -10,6 +10,8 @@ import { compareRecords } from "./compareRecords";
 import {
   addRecordToDb,
   fetchAllContent,
+  fetchGradeCategoriesForCourse,
+  fetchReportCard,
   updateCourseDisplayName,
 } from "./fetcher";
 import { addNotificationsToDb, parseMutations } from "./notifications";
@@ -204,6 +206,55 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    async function sendAlternateGradingPeriod(
+      courseKey: string,
+      gradeCategory: number
+    ) {
+      const record: GradebookRecord = await db
+        .table("records")
+        .orderBy("date")
+        .last();
+
+      const course = record.courses.find((c) => c.key === courseKey);
+
+      const grade = course?.grades[gradeCategory]?.key;
+
+      if (!grade) {
+        port.postMessage({
+          courseKey,
+          gradeCategory,
+          type: "setAlternateGradingPeriod",
+          gradeCategories: [],
+        });
+        return;
+      }
+
+      chrome.storage.local.get(["login"], (res) => {
+        const login = res["login"];
+
+        fetchReportCard(login.host, login.username, login.password).then(
+          (reportCard) => {
+            fetchGradeCategoriesForCourse(
+              login["host"],
+              reportCard.sessionId,
+              reportCard.referer,
+              {
+                ...course,
+                key: grade,
+              }
+            ).then((gradeCategories) => {
+              port.postMessage({
+                courseKey,
+                gradeCategory,
+                type: "setAlternateGradingPeriod",
+                gradeCategories: gradeCategories?.gradeCategories,
+              });
+            });
+          }
+        );
+      });
+    }
+
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -247,6 +298,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "enableNotifications") {
         enableNotifications();
+      }
+
+      if (msg.type === "requestAlternateGradingPeriod") {
+        sendAlternateGradingPeriod(msg.courseKey, msg.gradeCategory);
       }
     });
   });
