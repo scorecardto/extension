@@ -15,7 +15,16 @@ function storeInstallDate() {
 export default function versionManager() {
   chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === "install") {
-      chrome.tabs.create({ url: WELCOME_URL });
+      chrome.cookies.set(
+        {
+          url: getDomain(),
+          name: "EXT_ID",
+          value: chrome.runtime.id,
+        },
+        () => {
+          chrome.tabs.create({ url: WELCOME_URL });
+        }
+      );
       storeVersion(CURRENT_VERSION);
       storeInstallDate();
 

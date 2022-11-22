@@ -17,7 +17,10 @@
     "scripting",
     "alarms",
     "notifications",
-    "bookmarks"
+    "bookmarks",
+    "cookies",
+    "unlimitedStorage",
+    "background"
   ],
   "externally_connectable": {
     "matches": ["https://scorecardgrades.com/*", "http://localhost:4999/*"]
