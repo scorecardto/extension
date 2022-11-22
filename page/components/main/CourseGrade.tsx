@@ -15,10 +15,8 @@ function CourseGrade(props: { courseName: string; grade: string }) {
       <p>{props.courseName}</p>
 
       <div className="from-accent-500 to-accent-600 bg-gradient-to-tr w-12 text-center py-1.5 rounded-full">
-        <p className="hidden group-hover:block text-xs text-white">
-          {props.grade}
-        </p>
-        <p className="block group-hover:hidden text-xs text-white">. . .</p>
+        <p className="text-xs text-white">{props.grade}</p>
+        {/* <p className="block group-hover:hidden text-xs text-white">. . .</p> */}
       </div>
     </div>
   );
