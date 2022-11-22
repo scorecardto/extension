@@ -319,6 +319,16 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendClientId() {
+      chrome.storage.local.get(["clientId"], (res) => {
+        const clientId = res["clientId"];
+        port.postMessage({
+          type: "setClientId",
+          clientId,
+        });
+      });
+    }
+
     // storage listener for when recordslastupdated changes
     chrome.storage.onChanged.addListener((changes, namespace) => {
       if (namespace === "local") {
@@ -396,6 +406,10 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "requestErrors") {
         sendErrors();
+      }
+
+      if (msg.type === "requestClientId") {
+        sendClientId();
       }
     });
   });
