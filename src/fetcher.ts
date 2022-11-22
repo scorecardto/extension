@@ -183,7 +183,6 @@ const fetchGradeCategoriesForCourse = async (
   course: Course
 ): Promise<GradeCategoriesResponse> => {
   console.log(course.key);
-  // sectionIndex=2,gradeTypeIndex=1st 9 Weeks,courseIndex=2545.P000.Y,calendarIndex=1,gradeIndex=98,teacherIndex=Torres^ Rosa,dayCodeIndex=A - 02,locIndex=018
   const ASSIGNMENTS: Options = {
     url: `https://${host}/selfserve/PSSViewGradeBookEntriesAction.do?x-tab-id=undefined`,
     method: "POST",

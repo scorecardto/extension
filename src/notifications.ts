@@ -4,7 +4,8 @@ import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
 
 function parseMutations(
-  mutations: GradebookMutation[]
+  mutations: GradebookMutation[],
+  courseDisplayNames: { [key: string]: string }
 ): GradebookNotification[] {
   const notifications: GradebookNotification[] = [];
 
@@ -36,7 +37,10 @@ function parseMutations(
     let oldAverage = "";
     let newAverage = "";
 
-    const courseName = mutations[0].courseName ?? "Unknown Course";
+    const courseName =
+      (mutations[0].courseKey && courseDisplayNames[mutations[0].courseKey]) ??
+      mutations[0].courseName ??
+      "Unknown Course";
 
     if (
       mutations[0].newAverage &&
@@ -57,10 +61,6 @@ function parseMutations(
 
       icon = "FALL";
     }
-
-    console.log("Notification details:");
-
-    console.log(oldAverage, newAverage, mutations);
 
     mutations.forEach((mutation) => {
       if (mutation.grade && mutation.subject === "assignment") {
@@ -176,8 +176,14 @@ function addNotificationsToDb(
           db.transaction("rw", "notifications", () => {
             db.table("notifications")
               .each((notification: GradebookNotification) => {
-                if (time !== undefined && notification.read && Date.now() - notification.date >= time * 24 * 60 * 60 * 1000) {
-                  db.table("notifications").delete(notification.id as IndexableType);
+                if (
+                  time !== undefined &&
+                  notification.read &&
+                  Date.now() - notification.date >= time * 24 * 60 * 60 * 1000
+                ) {
+                  db.table("notifications").delete(
+                    notification.id as IndexableType
+                  );
                 }
               })
               .then(() => {

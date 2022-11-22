@@ -6,21 +6,29 @@ const DEFAULT_FREQUENCY_MINUTES = 30;
 export function startBackgroundSync(db: Dexie) {
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === "fetchGrades") {
-      fetchAndStoreContent(db).then((result) => {
-        chrome.storage.local.get(["settings"], (res) => {
-          if (res["settings"]?.["usePushNotifications"]) {
-            if (result.notifications && result.notifications.length > 0) {
-              result.notifications.forEach((notification) => {
-                chrome.notifications.create({
-                  type: "basic",
-                  iconUrl: chrome.runtime.getURL("assets/icons/lg.png"),
-                  title: notification.title,
-                  message: notification.message,
+      chrome.storage.local.get(["settings", "error"], (res) => {
+        fetchAndStoreContent(db)
+          .then((result) => {
+            if (res["settings"]?.["usePushNotifications"]) {
+              if (result.notifications && result.notifications.length > 0) {
+                result.notifications.forEach((notification) => {
+                  chrome.notifications.create({
+                    type: "basic",
+                    iconUrl: chrome.runtime.getURL("assets/icons/lg.png"),
+                    title: notification.title,
+                    message: notification.message,
+                  });
                 });
-              });
+              }
             }
-          }
-        });
+          })
+          .catch((err) => {
+            const error = res["error"] || [];
+            error.push({
+              message: err.message,
+              timestamp: new Date().getTime(),
+            });
+          });
       });
     }
   });

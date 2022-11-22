@@ -261,7 +261,15 @@ function startExternalConnection(db: Dexie) {
     }
 
     function sendReloadContent() {
-      fetchAndStoreContent(db);
+      fetchAndStoreContent(db).catch((err) => {
+        chrome.storage.local.get(["error"], (res) => {
+          const error = res["error"] || [];
+          error.push({
+            message: err.message,
+            timestamp: new Date().getTime(),
+          });
+        });
+      });
     }
     function addBookmark() {
       chrome.bookmarks.getTree((tree) => {
@@ -353,17 +361,27 @@ function startInternalConnection(db: Dexie) {
       sendResponse(currentlyFetching);
     }
     if (request.type === "requestContentReload") {
-      fetchAndStoreContent(db).then((result) => {
-        chrome.runtime.sendMessage(
-          {
-            type: "requestContentReloadResponse",
-            result: result.result || "SUCCESS",
-          },
-          () => {
-            // do nothing
-          }
-        );
-      });
+      fetchAndStoreContent(db)
+        .then((result) => {
+          chrome.runtime.sendMessage(
+            {
+              type: "requestContentReloadResponse",
+              result: result.result || "SUCCESS",
+            },
+            () => {
+              // do nothing
+            }
+          );
+        })
+        .catch((err) => {
+          chrome.storage.local.get(["error"], (res) => {
+            const error = res["error"] || [];
+            error.push({
+              message: err.message,
+              timestamp: new Date().getTime(),
+            });
+          });
+        });
     }
     sendResponse(false);
   });
@@ -374,57 +392,71 @@ export const fetchAndStoreContent = (db: Dexie) => {
     result?: string;
     notifications?: GradebookNotification[];
   }>((resolve) => {
-    if (currentlyFetching) {
-      resolve({ result: "ALREADY_FETCHING" });
-      return;
-    }
-
-    chrome.storage.local.get(["login"], async (res) => {
-      if (res["login"]) {
-        const login = res["login"];
-
-        const host = login.host;
-        const username = login.username;
-        const password = login.password;
-
-        currentlyFetching = true;
-
-        console.log("fetching all");
-        const allContent: AllContentResponse = await fetchAllContent(
-          host,
-          username,
-          password
-        );
-
-        currentlyFetching = false;
-
-        const previousRecord = await db.table("records").orderBy("date").last();
-
-        const gradeCategory =
-          allContent.courses[0].grades.filter((g) => g).length - 1;
-
-        await chrome.storage.local.set({
-          currentGradingCategory: gradeCategory,
-        });
-
-        const currentRecord = await addRecordToDb(
-          db,
-          allContent.courses,
-          allContent.gradeCategoryNames,
-          gradeCategory
-        );
-
-        const mutations = compareRecords(previousRecord, currentRecord);
-
-        const notifications = parseMutations(mutations);
-
-        await addNotificationsToDb(db, notifications);
-
-        resolve({ result: "SUCCESS", notifications });
-      } else {
-        resolve({ result: "LOGIN_NOT_FOUND" });
+    try {
+      if (currentlyFetching) {
+        resolve({ result: "ALREADY_FETCHING" });
+        return;
       }
-    });
+
+      chrome.storage.local.get(["login", "courseDisplayNames"], async (res) => {
+        if (res["login"]) {
+          const login = res["login"];
+
+          const host = login.host;
+          const username = login.username;
+          const password = login.password;
+
+          currentlyFetching = true;
+
+          let allContent: AllContentResponse;
+
+          try {
+            allContent = await fetchAllContent(host, username, password);
+          } catch (e) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            resolve({ result: "ERROR", error: e });
+            return;
+          }
+
+          currentlyFetching = false;
+
+          const previousRecord = await db
+            .table("records")
+            .orderBy("date")
+            .last();
+
+          const gradeCategory =
+            allContent.courses[0].grades.filter((g) => g).length - 1;
+
+          await chrome.storage.local.set({
+            currentGradingCategory: gradeCategory,
+          });
+
+          const currentRecord = await addRecordToDb(
+            db,
+            allContent.courses,
+            allContent.gradeCategoryNames,
+            gradeCategory
+          );
+
+          const mutations = compareRecords(previousRecord, currentRecord);
+
+          const notifications = parseMutations(
+            mutations,
+            res["courseDisplayNames"] ?? {}
+          );
+
+          await addNotificationsToDb(db, notifications);
+
+          resolve({ result: "SUCCESS", notifications });
+        } else {
+          resolve({ result: "LOGIN_NOT_FOUND" });
+        }
+      });
+    } catch (e) {
+      resolve({ result: "ERROR" });
+    }
   });
 };
 export { startExternalConnection, startInternalConnection };
