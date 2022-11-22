@@ -83,6 +83,10 @@ function startExternalConnection(db: Dexie) {
 
         await db.table("records").clear();
 
+        await chrome.storage.local.set({
+          error: [],
+        });
+
         await addRecordToDb(
           db,
           allContent.courses,
@@ -268,6 +272,9 @@ function startExternalConnection(db: Dexie) {
             message: err.message,
             timestamp: new Date().getTime(),
           });
+          chrome.storage.local.set({
+            error,
+          });
         });
       });
     }
@@ -301,6 +308,26 @@ function startExternalConnection(db: Dexie) {
         });
       });
     }
+
+    function sendErrors() {
+      chrome.storage.local.get(["error"], (res) => {
+        const errors = res["error"] ?? [];
+        port.postMessage({
+          type: "setErrors",
+          errors,
+        });
+      });
+    }
+
+    // storage listener for when recordslastupdated changes
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+      if (namespace === "local") {
+        if (changes["recordsLastUpdated"]) {
+          sendCourses();
+          sendLoadingState();
+        }
+      }
+    });
 
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
@@ -366,6 +393,10 @@ function startExternalConnection(db: Dexie) {
       if (msg.type === "requestCoursesLastUpdated") {
         sendCoursesLastUpdated();
       }
+
+      if (msg.type === "requestErrors") {
+        sendErrors();
+      }
     });
   });
 }
@@ -392,8 +423,11 @@ function startInternalConnection(db: Dexie) {
           chrome.storage.local.get(["error"], (res) => {
             const error = res["error"] || [];
             error.push({
-              message: err.message,
+              message: err.result || err.message,
               timestamp: new Date().getTime(),
+            });
+            chrome.storage.local.set({
+              error,
             });
           });
         });
@@ -406,7 +440,7 @@ export const fetchAndStoreContent = (db: Dexie) => {
   return new Promise<{
     result?: string;
     notifications?: GradebookNotification[];
-  }>((resolve) => {
+  }>((resolve, reject) => {
     try {
       if (currentlyFetching) {
         resolve({ result: "ALREADY_FETCHING" });
@@ -430,7 +464,7 @@ export const fetchAndStoreContent = (db: Dexie) => {
           } catch (e) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            resolve({ result: "ERROR", error: e });
+            reject({ result: e.message || "UNKNOWN_ERROR" });
             return;
           }
 
@@ -466,11 +500,11 @@ export const fetchAndStoreContent = (db: Dexie) => {
 
           resolve({ result: "SUCCESS", notifications });
         } else {
-          resolve({ result: "LOGIN_NOT_FOUND" });
+          reject({ result: "LOGIN_NOT_FOUND" });
         }
       });
     } catch (e) {
-      resolve({ result: "ERROR" });
+      reject({ result: "ERROR" });
     }
   });
 };

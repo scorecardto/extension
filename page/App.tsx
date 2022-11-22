@@ -16,7 +16,9 @@ import { IndexableType } from "dexie";
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
   const [gradeCategory, setGradeCategory] = useState<number>(0);
-  const [courseDisplayNames, setCourseDisplayNames] = useState<{[key: string]: string;}>({});
+  const [courseDisplayNames, setCourseDisplayNames] = useState<{
+    [key: string]: string;
+  }>({});
 
   const dataContext = useMemo(
     () => ({
@@ -25,38 +27,42 @@ function App() {
       gradeCategory,
       setGradeCategory,
       courseDisplayNames,
-      setCourseDisplayNames
+      setCourseDisplayNames,
     }),
-    [data, gradeCategory, setGradeCategory, courseDisplayNames, setCourseDisplayNames]
+    [
+      data,
+      gradeCategory,
+      setGradeCategory,
+      courseDisplayNames,
+      setCourseDisplayNames,
+    ]
   );
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (data?.courses[0]) {
-      // const length = data.courses[0].grades.filter((g) => g).length;
-
-      // if (length) {
-      //   setGradeCategory(Math.max(0, length - 1));
-      // }
-
-      const TEN_MINUTES = 1000 * 60 * 10;
-
-      if (data.date < Date.now() - TEN_MINUTES) {
-        reloadContent();
+    chrome.storage.local.get(["settings", "error"], (result) => {
+      const minutes = result.settings?.checkGradesInterval || 30;
+      if (data?.courses[0] && !result.error) {
+        if (data.date < Date.now() - 1000 * 60 * minutes) {
+          reloadContent();
+        }
       }
-    }
+    });
   }, [data]);
 
   useEffect(() => {
-    chrome.storage.local.get(["currentGradingCategory", "courseDisplayNames"], (result) => {
-      if (result.currentGradingCategory) {
-        setGradeCategory(result.currentGradingCategory);
+    chrome.storage.local.get(
+      ["currentGradingCategory", "courseDisplayNames"],
+      (result) => {
+        if (result.currentGradingCategory) {
+          setGradeCategory(result.currentGradingCategory);
+        }
+        if (result.courseDisplayNames) {
+          setCourseDisplayNames(result.courseDisplayNames);
+        }
       }
-      if (result.courseDisplayNames) {
-        setCourseDisplayNames(result.courseDisplayNames);
-      }
-    });
+    );
 
     chrome.runtime.sendMessage(
       {
@@ -142,12 +148,15 @@ function App() {
         chrome.storage.local.get("settings").then((res) => {
           const time = res.settings?.deleteNotificationsAfter;
 
-          if (time !== undefined && Date.now() - lastNotification.date >= time * 24 * 60 * 60 * 1000) {
+          if (
+            time !== undefined &&
+            Date.now() - lastNotification.date >= time * 24 * 60 * 60 * 1000
+          ) {
             db.table("notifications")
               .delete(lastNotification.id as IndexableType)
               .then(() => {
                 setNotifications([...notifications]);
-              })
+              });
           } else {
             lastNotification.read = true;
 

@@ -182,7 +182,6 @@ const fetchGradeCategoriesForCourse = async (
   referer: string,
   course: Course
 ): Promise<GradeCategoriesResponse> => {
-  console.log(course.key);
   const ASSIGNMENTS: Options = {
     url: `https://${host}/selfserve/PSSViewGradeBookEntriesAction.do?x-tab-id=undefined`,
     method: "POST",
@@ -431,6 +430,7 @@ const addRecordToDb = (
     db.table("records")
       .add(record)
       .then(() => {
+        chrome.storage.local.set({ recordsLastUpdated: Date.now() });
         resolve(record);
       });
   });
