@@ -19,10 +19,7 @@
     "notifications"
   ],
   "externally_connectable": {
-    "matches": [
-      "https://scorecard-iota.vercel.app/*",
-      "http://localhost:4999/*"
-    ]
+    "matches": ["https://scorecardgrades.com/*", "http://localhost:4999/*"]
   },
   "host_permissions": ["<all_urls>"],
   "icons": {

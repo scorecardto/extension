@@ -1,7 +1,7 @@
 import { handleInstall, handleUninstall } from "./metrics";
 
 const WELCOME_URL =
-  "https://scorecard-iota.vercel.app/app/connect-account?hidden-action=setup";
+  "https://scorecardgrades.com/app/connect-account?hidden-action=setup";
 const CURRENT_VERSION = chrome.runtime.getManifest().version;
 
 function storeVersion(version: string) {

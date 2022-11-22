@@ -1,7 +1,7 @@
 import axios from "redaxios";
 import { UAParser } from "ua-parser-js";
 
-const DOMAIN = "https://scorecard-iota.vercel.app";
+const DOMAIN = "https://scorecardgrades.com";
 
 export async function handleInstall(
   installDate: Date,

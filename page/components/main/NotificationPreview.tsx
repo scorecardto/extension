@@ -73,7 +73,14 @@ function NotificationsPreview() {
             }}
           >
             {!showingNotification && (
-              <a href="https://scorecard-iota.vercel.app/app/notifications" target="_blank" className="w-full">View Past Notifications</a>
+              <a
+                href="https://scorecardgrades.com/app/notifications"
+                target="_blank"
+                className="w-full"
+                rel="noreferrer"
+              >
+                View Past Notifications
+              </a>
             )}
           </motion.div>
         </div>
