@@ -260,6 +260,9 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendReloadContent() {
+      fetchAndStoreContent(db);
+    }
     function addBookmark() {
       chrome.bookmarks.getTree((tree) => {
         const bookmarksBar = tree[0].children?.find(
@@ -274,6 +277,12 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendLoadingState() {
+      port.postMessage({
+        type: "setLoadingState",
+        loading: currentlyFetching,
+      });
+    }
     port.onMessage.addListener((msg) => {
       if (msg.type === "requestCourses") {
         sendCourses();
@@ -325,6 +334,14 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "addBookmark") {
         addBookmark();
+      }
+
+      if (msg.type === "requestReloadContent") {
+        sendReloadContent();
+      }
+
+      if (msg.type === "requestLoadingState") {
+        sendLoadingState();
       }
     });
   });
