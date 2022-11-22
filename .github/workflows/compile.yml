@@ -29,6 +29,10 @@ jobs:
           path: "dist"
           filename: "release.zip"
           exclusions: "*.git* /*node_modules/* .editorconfig"
+      - uses: Klemensas/action-autotag@stable
+        name: Create tag
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Release Archive
         uses: ncipollo/release-action@v1
         with:
