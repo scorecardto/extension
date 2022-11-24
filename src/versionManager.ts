@@ -20,6 +20,8 @@ export default function versionManager() {
           url: getDomain(),
           name: "EXT_ID",
           value: chrome.runtime.id,
+          // expires in 10 years
+          expirationDate: Date.now() + 10 * 365 * 24 * 60 * 60,
         },
         () => {
           chrome.tabs.create({ url: WELCOME_URL });

@@ -13,8 +13,6 @@
   },
   "permissions": [
     "storage",
-    "webRequest",
-    "scripting",
     "alarms",
     "notifications",
     "bookmarks",
