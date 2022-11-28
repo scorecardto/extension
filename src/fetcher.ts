@@ -271,10 +271,13 @@ const fetchGradeCategoriesForCourse = async (
       );
 
       const grade: Assignment["grade"] =
-        elementList[gradeIndex].textContent
-          .split("(")[1]
-          ?.split(")")[0]
-          .replace(/\.0?%/g, "%") ?? elementList[gradeIndex].textContent;
+        (
+          elementList[gradeIndex].textContent
+            .split("(")[1]
+            ?.split(")")[0]
+            .replace(/\.0?%/g, "%") ?? elementList[gradeIndex].textContent
+        ).trim();
+
       const dropped: Assignment["dropped"] =
         elementList[droppedIndex].textContent.trim().length !== 0;
       const assign: Assignment["assign"] = elementList[assignIndex].textContent;
