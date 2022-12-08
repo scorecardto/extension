@@ -1,8 +1,8 @@
 {
-  "name": "Scorecard: Free Gradebook Viewer",
-  "version": "0.1.1",
+  "name": "Scorecard: Gradebook Viewer",
+  "version": "0.1.3",
   "manifest_version": 3,
-  "description": "Scorecard: Free Gradebook Viewer for Frontline with Grade Testing, History, and GPA.",
+  "description": "Scorecard: Gradebook Viewer for Frontline with Grade Testing, Notifications, and GPA.",
   "homepage_url": "https://scorecardgrades.com",
   "action": {
     "default_popup": "page/index.html"
