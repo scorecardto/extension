@@ -1,7 +1,9 @@
 import Dexie from "dexie";
 import { fetchAndStoreContent } from "./connector";
+import { getDomain } from "./domain";
 
 const DEFAULT_FREQUENCY_MINUTES = 30;
+let NOTIF_ID = 0;
 
 export function startBackgroundSync(db: Dexie) {
   chrome.alarms.onAlarm.addListener((alarm) => {
@@ -11,8 +13,8 @@ export function startBackgroundSync(db: Dexie) {
           .then((result) => {
             if (res["settings"]?.["usePushNotifications"]) {
               if (result.notifications && result.notifications.length > 0) {
-                result.notifications.forEach((notification) => {
-                  chrome.notifications.create({
+                result.notifications.forEach(async (notification) => {
+                  chrome.notifications.create(notification.course+"|"+(NOTIF_ID++),{
                     type: "basic",
                     iconUrl: chrome.runtime.getURL("assets/icons/lg.png"),
                     title: notification.title,

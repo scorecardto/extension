@@ -211,7 +211,7 @@ function startExternalConnection(db: Dexie) {
         type: "basic",
         iconUrl: chrome.runtime.getURL("assets/icons/lg.png"),
         title: "Notifications Appear Here",
-        message: "Thanks for chosing Scorecard, the free gradebook viewer.",
+        message: "Thanks for choosing Scorecard, the free gradebook viewer.",
       });
     }
 

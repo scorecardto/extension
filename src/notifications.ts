@@ -2,6 +2,7 @@ import Dexie, { IndexableType } from "dexie";
 import { Course, GradebookNotification } from "scorecard-types";
 import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
+import { getDomain } from "./domain";
 
 function parseMutations(
   mutations: GradebookMutation[],
@@ -99,6 +100,7 @@ function parseMutations(
               } from ${oldAverage} to ${newAverage}.`,
         date: Date.now(),
         read: false,
+        course: courseKey,
       });
     } else if (withValue.length > 1) {
       const gradeCount = withValue.length;
@@ -114,6 +116,7 @@ function parseMutations(
               } from ${oldAverage} to ${newAverage}.`,
         date: Date.now(),
         read: false,
+        course: courseKey,
       });
     }
 
@@ -126,6 +129,7 @@ function parseMutations(
         message: `A new assignment was added without a grade: ${assignmentName}.`,
         date: Date.now(),
         read: false,
+        course: courseKey,
       });
     } else if (withoutValue.length > 1) {
       const assignmentCount = withoutValue.length;
@@ -138,6 +142,7 @@ function parseMutations(
         )} were added without a grade.`,
         date: Date.now(),
         read: false,
+        course: courseKey,
       });
     }
   });
@@ -160,6 +165,7 @@ function parseMutations(
             } and some of your settings may have changed.`,
       date: Date.now(),
       read: false,
+      course: newRemovedCourseNotifications[courseName][0].courseKey,
     });
   } else if (updatedCourses.length > 1) {
     notifications.push({
@@ -206,4 +212,12 @@ function addNotificationsToDb(
   });
 }
 
-export { parseMutations, addNotificationsToDb };
+function addNotificationClickHandler() {
+  chrome.notifications.onClicked.addListener((id) => {
+    if (id.includes("|")) {
+      chrome.tabs.create({ url: getDomain() + '/app#' + id.split("|")[0] });
+    }
+  })
+}
+
+export { parseMutations, addNotificationsToDb, addNotificationClickHandler };

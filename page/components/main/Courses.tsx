@@ -28,6 +28,7 @@ function Courses() {
               return (
                 <CourseGrade
                   courseName={data.courseDisplayNames[c.key] || c.name}
+                  courseKey={c.key}
                   grade={c.grades[data.gradeCategory]?.value || "NG"}
                   key={i}
                 />

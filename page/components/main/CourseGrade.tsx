@@ -2,12 +2,12 @@ import React from "react";
 import { getDomain } from "../../../src/domain";
 import Chip from "./Chip";
 
-function CourseGrade(props: { courseName: string; grade: string }) {
+function CourseGrade(props: { courseName: string; courseKey: string; grade: string }) {
   return (
     <div
       onClick={() => {
         chrome.tabs.create({
-          url: `${getDomain()}/app#${props.courseName}`,
+          url: `${getDomain()}/app#${props.courseKey}`,
         });
       }}
       className="group flex justify-between items-center border-b last:border-b-0 border-b-mono-200 py-2 px-4 hover:bg-mono-150 cursor-pointer overflow-hidden"
