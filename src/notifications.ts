@@ -215,7 +215,9 @@ function addNotificationsToDb(
 function addNotificationClickHandler() {
   chrome.notifications.onClicked.addListener((id) => {
     if (id.includes("|")) {
-      chrome.tabs.create({ url: getDomain() + '/app#' + id.split("|")[0] });
+      chrome.tabs.create({ url: getDomain() + '/app#' + id.split("|")[0] }).then((tab) => {
+        chrome.windows.update(tab.windowId, {focused: true})
+      });
     }
   })
 }
