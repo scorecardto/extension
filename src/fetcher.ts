@@ -266,7 +266,7 @@ const fetchGradeCategoriesForCourse = async (
 
       const name: Assignment["name"] = elementList[nameIndex].textContent;
 
-      const points: Assignment["points"] = parseInt(
+      const points: Assignment["points"] = parseFloat(
         elementList[gradeIndex].textContent
       );
 
@@ -282,7 +282,7 @@ const fetchGradeCategoriesForCourse = async (
         elementList[droppedIndex].textContent.trim().length !== 0;
       const assign: Assignment["assign"] = elementList[assignIndex].textContent;
       const due: Assignment["due"] = elementList[dueDateIndex].textContent;
-      const scale: Assignment["scale"] = parseInt(
+      const scale: Assignment["scale"] = parseFloat(
         elementList[scaleIndex].textContent
       );
       const max: Assignment["max"] = parseInt(
