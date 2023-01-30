@@ -490,7 +490,7 @@ export const fetchAndStoreContent = (db: Dexie) => {
             .last();
 
           const gradeCategory =
-            allContent.courses[0].grades.filter((g) => g).length - 1;
+            Math.max(...allContent.courses.map((c => c.grades.filter((g) => g).length - 1)));
 
           await chrome.storage.local.set({
             currentGradingCategory: gradeCategory,

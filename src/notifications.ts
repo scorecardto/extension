@@ -215,9 +215,17 @@ function addNotificationsToDb(
 function addNotificationClickHandler() {
   chrome.notifications.onClicked.addListener((id) => {
     if (id.includes("|")) {
-      chrome.tabs.create({ url: getDomain() + '/app#' + id.split("|")[0] }).then((tab) => {
-        chrome.windows.update(tab.windowId, {focused: true})
-      });
+      chrome.windows.getAll().then(windows => {
+        let url = getDomain() + '/app#' + id.split("|")[0];
+
+        if (windows.length == 0) {
+          chrome.windows.create({ focused: true, url: url, state: 'maximized' })
+        } else {
+          chrome.tabs.create({ url: url, active: true }).then((tab) => {
+            chrome.windows.update(tab.windowId, {focused: true})
+          });
+        }
+      })
     }
   })
 }
