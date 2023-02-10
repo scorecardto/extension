@@ -3,6 +3,7 @@ import Loading from "../util/context/Loading";
 import { DataContext, LoadingContext } from "scorecard-types";
 import Chip from "./Chip";
 import GradingPeriodSelector from "./GradingCategorySelector";
+import { getDomain } from "../../../src/domain.ts";
 
 function TopContainer(props: {
   editingGradingCategory: boolean;
@@ -23,7 +24,7 @@ function TopContainer(props: {
 
   return (
     <div className="flex justify-between items-center bg-mono-100 p-3 fixed top-0 left-0 w-full">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 cursor-pointer" onClick={()=>chrome.tabs.create({"active": true, url: getDomain()})}>
         <img
           src={chrome.runtime.getURL("assets/icons/md.png")}
           className="w-6 h-6"
