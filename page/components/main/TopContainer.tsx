@@ -24,7 +24,7 @@ function TopContainer(props: {
 
   return (
     <div className="flex justify-between items-center bg-mono-100 p-3 fixed top-0 left-0 w-full">
-      <div className="flex items-center gap-4 cursor-pointer" onClick={()=>chrome.tabs.create({"active": true, url: getDomain()})}>
+      <div className="flex items-center gap-4 cursor-pointer" onClick={()=>chrome.tabs.create({"active": true, url: getDomain()+"/app"})}>
         <img
           src={chrome.runtime.getURL("assets/icons/md.png")}
           className="w-6 h-6"
