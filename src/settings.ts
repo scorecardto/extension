@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS: Settings = {
   usePushNotifications: false,
   checkGradesInterval: 30,
   deleteNotificationsAfter: 5,
-  spoilerMode: true,
+  spoilerMode: false,
 };
 
 export function checkSettings() {
