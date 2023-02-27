@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+import { Buffer } from "Buffer";
 import {
   AllContentResponse,
   GradebookNotification,
@@ -37,14 +38,12 @@ function startExternalConnection(db: Dexie) {
     }
 
     function sendSetup() {
-      chrome.storage.local.get(["login"], async (res) => {
-        if (res["login"]) {
-          const login = res["login"];
-
+      getLogin().then((res) => {
+        if (res) {
           const setup: SetupState = {
-            username: login["username"],
-            hasPassword: login["password"] !== undefined,
-            host: login["host"],
+            username: res["username"],
+            hasPassword: res["password"] !== undefined,
+            host: res["host"],
           };
 
           port.postMessage({
@@ -66,7 +65,7 @@ function startExternalConnection(db: Dexie) {
       passwordParam: string
     ) {
       try {
-        const password = passwordParam || (await getLogin())["password"];
+        let password = passwordParam || (await getLogin()).password;
 
         const allContent: AllContentResponse = await fetchAllContent(
           host,
@@ -94,6 +93,7 @@ function startExternalConnection(db: Dexie) {
           gradeCategory
         );
 
+        password = Buffer.from(password).toString('base64');
         chrome.storage.local.set({
           login: {
             host,
@@ -238,13 +238,11 @@ function startExternalConnection(db: Dexie) {
         return;
       }
 
-      chrome.storage.local.get(["login"], (res) => {
-        const login = res["login"];
-
-        fetchReportCard(login.host, login.username, login.password).then(
+      getLogin().then((res) => {
+        fetchReportCard(res.host, res.username, res.password).then(
           (reportCard) => {
             fetchGradeCategoriesForCourse(
-              login["host"],
+              res.host,
               reportCard.sessionId,
               reportCard.referer,
               {

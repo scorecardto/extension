@@ -1,6 +1,21 @@
+import { Buffer } from "Buffer";
+
 export async function getLogin() {
-  const login = await chrome.storage.local.get(["login"]);
-  return login["login"];
+  const login = (await chrome.storage.local.get(["login"])).login;
+
+  if (Buffer.from(login.password, 'base64').toString().match("�")) { // � is what is found when it doesn't decode properly, I think
+    login.password = Buffer.from(login.password, 'base64').toString();
+  } else {
+    await chrome.storage.local.set({
+      login: {
+        host: login.host,
+        username: login.username,
+        password: Buffer.from(login.password).toString('base64')
+      }
+    });
+  }
+
+  return login;
 }
 
 export function AorAn(count: string) {

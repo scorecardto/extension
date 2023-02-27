@@ -12,6 +12,7 @@ import Loading from "./components/util/context/Loading";
 import Welcome from "./components/main/Welcome";
 import { startDatabase } from "../src/database";
 import { IndexableType } from "dexie";
+import { getLogin } from "../src/util";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
@@ -123,12 +124,12 @@ function App() {
   const [login, setLogin] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    chrome.storage.local.get(["login"], (result) => {
+    getLogin().then((result) => {
       setLogin(
-        !!result.login &&
-          !!result.login.username &&
-          !!result.login.password &&
-          !!result.login.host
+        !!result &&
+          !!result.username &&
+          !!result.password &&
+          !!result.host
       );
     });
   }, []);
