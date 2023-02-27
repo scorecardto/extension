@@ -27,7 +27,7 @@ function Courses() {
             {courses.map((c, i) => {
               return (
                 <CourseGrade
-                  courseName={data.courseDisplayNames[c.key] || c.name}
+                  courseName={data.courseSettings[c.key]?.displayName ?? c.name}
                   courseKey={c.key}
                   grade={c.grades[data.gradeCategory]?.value || "NG"}
                   key={i}

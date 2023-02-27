@@ -1,6 +1,7 @@
 import axios, { Options } from "redaxios";
 import Form from "form-data";
 import parse from "node-html-parser";
+import { CourseSettings } from "scorecard-types";
 import qs from "qs";
 import * as iso88592 from "iso-8859-2";
 
@@ -361,22 +362,30 @@ const fetchGradeCategoriesForCourse = async (
   };
 };
 
-const updateCourseDisplayName = async (
+const updateCourseSettings = async (
   courseKey: string,
-  displayName: string
+  settings: CourseSettings
 ): Promise<boolean> => {
-  const courseNames =
-    (await chrome.storage.local.get("courseDisplayNames"))[
-      "courseDisplayNames"
+  const courseSettings =
+    (await chrome.storage.local.get("courseSettings"))[
+      "courseSettings"
     ] ?? {};
 
-  if (displayName === "") {
-    delete courseNames[courseKey];
+  if (settings === null) {
+    delete courseSettings[courseKey];
   } else {
-    courseNames[courseKey] = displayName;
+    if (courseSettings[courseKey] === undefined) {
+      courseSettings[courseKey] = settings;
+    } else {
+      for (const prop of Object.keys(settings)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (settings[prop] != null) courseSettings[courseKey][prop] = settings[prop];
+      }
+    }
   }
 
-  await chrome.storage.local.set({ courseDisplayNames: courseNames });
+  await chrome.storage.local.set({ courseSettings: courseSettings });
 
   return true;
 };
@@ -463,7 +472,7 @@ const fetchAllContent = async (
 
 export {
   fetchReportCard,
-  updateCourseDisplayName,
+  updateCourseSettings,
   fetchGradeCategoriesForCourse,
   addRecordToDb,
   fetchGradeCategoriesForCourses,

@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Main from "./components/main/Main";
 import {
+  CourseSettings,
   DataContext,
   GradebookNotification,
-  NotificationContext,
+  NotificationContext
 } from "scorecard-types";
 import { GradebookRecord } from "scorecard-types";
 import { LoadingContext } from "scorecard-types";
@@ -13,12 +14,13 @@ import Welcome from "./components/main/Welcome";
 import { startDatabase } from "../src/database";
 import { IndexableType } from "dexie";
 import { getLogin } from "../src/util";
+import { updateCourseSettings } from "../src/fetcher";
 
 function App() {
   const [data, setData] = useState<GradebookRecord | null>(null);
   const [gradeCategory, setGradeCategory] = useState<number>(0);
-  const [courseDisplayNames, setCourseDisplayNames] = useState<{
-    [key: string]: string;
+  const [courseSettings, setCourseSettings] = useState<{
+    [key: string]: CourseSettings;
   }>({});
 
   const dataContext = useMemo(
@@ -27,15 +29,15 @@ function App() {
       setData,
       gradeCategory,
       setGradeCategory,
-      courseDisplayNames,
-      setCourseDisplayNames,
+      courseSettings,
+      setCourseSettings,
     }),
     [
       data,
       gradeCategory,
       setGradeCategory,
-      courseDisplayNames,
-      setCourseDisplayNames,
+      courseSettings,
+      setCourseSettings,
     ]
   );
 
@@ -53,15 +55,36 @@ function App() {
   }, [data]);
 
   useEffect(() => {
+    // TODO: only have to have this extra fetch to migrate old local data
     chrome.storage.local.get(
-      ["currentGradingCategory", "courseDisplayNames"],
-      (result) => {
-        if (result.currentGradingCategory) {
-          setGradeCategory(result.currentGradingCategory);
-        }
+      ["courseDisplayNames", "coursesLastUpdated"],
+      async (result) => {
         if (result.courseDisplayNames) {
-          setCourseDisplayNames(result.courseDisplayNames);
+          for (const key of Object.keys(result.courseDisplayNames)) {
+            await updateCourseSettings(key, { displayName: result.courseDisplayNames[key] });
+          }
+
+          await chrome.storage.local.remove("courseDisplayNames");
         }
+        if (result.coursesLastUpdated) {
+          for (const key of Object.keys(result.coursesLastUpdated)) {
+            await updateCourseSettings(key, { lastUpdated: result.coursesLastUpdated[key] });
+          }
+
+          await chrome.storage.local.remove("coursesLastUpdated");
+        }
+
+        chrome.storage.local.get(
+          ["currentGradingCategory", "courseSettings"],
+          (result) => {
+            if (result.currentGradingCategory) {
+              setGradeCategory(result.currentGradingCategory);
+            }
+            if (result.courseSettings) {
+              setCourseSettings(result.courseSettings);
+            }
+          }
+        );
       }
     );
 

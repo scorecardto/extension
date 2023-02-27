@@ -1,12 +1,12 @@
 import Dexie, { IndexableType } from "dexie";
-import { Course, GradebookNotification } from "scorecard-types";
+import { Course, CourseSettings, GradebookNotification } from "scorecard-types";
 import { GradebookMutation } from "./compareRecords";
 import { AorAn, pluralize } from "./util";
 import { getDomain } from "./domain";
 
 function parseMutations(
   mutations: GradebookMutation[],
-  courseDisplayNames: { [key: string]: string }
+  courseSettings: { [key: string]: CourseSettings }
 ): GradebookNotification[] {
   const notifications: GradebookNotification[] = [];
 
@@ -14,16 +14,20 @@ function parseMutations(
   const courseMutations: Record<string, GradebookMutation[]> = {};
   const newRemovedCourseNotifications: Record<string, GradebookMutation[]> = {};
 
-  chrome.storage.local.get(["coursesLastUpdated"], (res) => {
-    const coursesLastUpdated = res.coursesLastUpdated || {};
+  chrome.storage.local.get(["courseSettings"], (res) => {
+    const courseSettings = res.courseSettings || {};
 
     mutations.forEach((mutation) => {
       if (mutation.courseKey) {
-        coursesLastUpdated[mutation.courseKey] = Date.now();
+        if (courseSettings[mutation.courseKey] === undefined) {
+          courseSettings[mutation.courseKey] = { lastUpdated: Date.now() };
+        } else {
+          courseSettings[mutation.courseKey].lastUpdated = Date.now();
+        }
       }
     });
 
-    chrome.storage.local.set({ coursesLastUpdated });
+    chrome.storage.local.set({ courseSettings });
   });
   mutations.forEach((mutation) => {
     if (mutation.courseKey) {
@@ -50,7 +54,7 @@ function parseMutations(
     let newAverage = "";
 
     const courseName =
-      (mutations[0].courseKey && courseDisplayNames[mutations[0].courseKey]) ??
+      (mutations[0].courseKey && courseSettings[mutations[0].courseKey]?.displayName) ??
       mutations[0].courseName ??
       "Unknown Course";
 
@@ -219,7 +223,7 @@ function addNotificationClickHandler() {
   chrome.notifications.onClicked.addListener((id) => {
     if (id.includes("|")) {
       chrome.windows.getAll().then(windows => {
-        let url = getDomain() + '/app#' + id.split("|")[0];
+        const url = getDomain() + '/app#' + id.split("|")[0];
 
         if (windows.length == 0) {
           chrome.windows.create({ focused: true, url: url, state: 'maximized' })

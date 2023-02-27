@@ -1,11 +1,11 @@
 import Dexie from "dexie";
 import { Buffer } from "Buffer";
 import {
-  AllContentResponse,
+  AllContentResponse, CourseSettings,
   GradebookNotification,
   GradebookRecord,
   Settings,
-  SetupState,
+  SetupState
 } from "scorecard-types";
 import { compareRecords } from "./compareRecords";
 import { getDomain } from "./domain";
@@ -14,7 +14,7 @@ import {
   fetchAllContent,
   fetchGradeCategoriesForCourse,
   fetchReportCard,
-  updateCourseDisplayName,
+  updateCourseSettings,
 } from "./fetcher";
 import { addNotificationsToDb, parseMutations } from "./notifications";
 import { getLogin } from "./util";
@@ -113,20 +113,20 @@ function startExternalConnection(db: Dexie) {
       }
     }
 
-    function updateCourseDisplayNameResponse(
+    function updateCourseSettingsResponse(
       courseKey: string,
-      displayName: string
+      settings: CourseSettings
     ) {
-      updateCourseDisplayName(courseKey, displayName).then(
-        sendCourseDisplayNames
+      updateCourseSettings(courseKey, settings).then(
+        sendCourseSettings
       );
     }
 
-    function sendCourseDisplayNames() {
-      chrome.storage.local.get("courseDisplayNames", (res) => {
+    function sendCourseSettings() {
+      chrome.storage.local.get("courseSettings", (res) => {
         port.postMessage({
-          type: "setCourseDisplayNames",
-          courseDisplayNames: res["courseDisplayNames"],
+          type: "setCourseSettings",
+          settings: res["courseSettings"],
         });
       });
     }
@@ -297,16 +297,6 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
-    function sendCoursesLastUpdated() {
-      chrome.storage.local.get(["coursesLastUpdated"], (res) => {
-        const lastUpdated = res["coursesLastUpdated"] ?? {};
-        port.postMessage({
-          type: "setCoursesLastUpdated",
-          lastUpdated,
-        });
-      });
-    }
-
     function sendErrors() {
       chrome.storage.local.get(["error"], (res) => {
         const errors = res["error"] ?? [];
@@ -350,12 +340,12 @@ function startExternalConnection(db: Dexie) {
         sendValidPassword(msg.host, msg.username, msg.password);
       }
 
-      if (msg.type === "updateCourseDisplayName") {
-        updateCourseDisplayNameResponse(msg.courseKey, msg.displayName);
+      if (msg.type === "updateCourseSettings") {
+        updateCourseSettingsResponse(msg.courseKey, msg.settings);
       }
 
-      if (msg.type === "requestCourseDisplayNames") {
-        sendCourseDisplayNames();
+      if (msg.type === "requestCourseSettings") {
+        sendCourseSettings();
       }
 
       if (msg.type === "requestGradingCategory") {
@@ -396,10 +386,6 @@ function startExternalConnection(db: Dexie) {
 
       if (msg.type === "requestLoadingState") {
         sendLoadingState();
-      }
-
-      if (msg.type === "requestCoursesLastUpdated") {
-        sendCoursesLastUpdated();
       }
 
       if (msg.type === "requestErrors") {
@@ -459,10 +445,10 @@ export const fetchAndStoreContent = (db: Dexie) => {
         return;
       }
 
-      chrome.storage.local.get(["login", "courseDisplayNames"], async (res) => {
-        if (res["login"]) {
-          const login = res["login"];
+      chrome.storage.local.get(["courseSettings"], async (res) => {
+        const login = await getLogin();
 
+        if (login) {
           const host = login.host;
           const username = login.username;
           const password = login.password;
@@ -505,7 +491,7 @@ export const fetchAndStoreContent = (db: Dexie) => {
 
           const notifications = parseMutations(
             mutations,
-            res["courseDisplayNames"] ?? {}
+            res["courseSettings"] ?? {}
           );
 
           await addNotificationsToDb(db, notifications);
