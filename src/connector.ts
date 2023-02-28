@@ -1,5 +1,5 @@
 import Dexie from "dexie";
-import { Buffer } from "node:buffer";
+import { Buffer } from "buffer";
 import {
   AllContentResponse, CourseSettings,
   GradebookNotification,
