@@ -2,6 +2,7 @@ import { Buffer } from "buffer";
 
 export async function getLogin() {
   const login = (await chrome.storage.local.get(["login"])).login;
+  if (login == null) return null;
 
   // TODO: this check is only for existing plaintext passwords
   if (!Buffer.from(login.password, 'base64').toString().match("�")) { // � is what is found when it doesn't decode properly, I think
