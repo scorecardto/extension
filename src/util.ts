@@ -1,4 +1,4 @@
-import { Buffer } from "Buffer";
+import { Buffer } from "node:buffer";
 
 export async function getLogin() {
   const login = (await chrome.storage.local.get(["login"])).login;
