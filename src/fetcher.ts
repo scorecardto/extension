@@ -455,6 +455,20 @@ const fetchAllContent = async (
 ): Promise<AllContentResponse> => {
   const reportCard = await fetchReportCard(host, username, password);
 
+  chrome.storage.local.get("courseOrder", (res) => {
+    const courseOrder = res["courseOrder"] ?? [];
+
+    for (const i in reportCard.courses) {
+      const c = reportCard.courses[i];
+
+      if (!courseOrder[c.key]) {
+        courseOrder.splice(i, 0, c.key); // insert but weird bc js
+      }
+    }
+
+    chrome.storage.local.set({courseOrder});
+  });
+
   const gradeCategories = reportCard.gradeCategoryNames;
 
   const assignmentsAllCoursesResponse = await fetchGradeCategoriesForCourses(

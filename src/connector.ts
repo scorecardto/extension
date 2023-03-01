@@ -131,6 +131,15 @@ function startExternalConnection(db: Dexie) {
       });
     }
 
+    function sendCourseOrder() {
+      chrome.storage.local.get("courseOrder", (res) => {
+        port.postMessage({
+          type: "setCourseOrder",
+          courseOrder: res["courseOrder"]
+        })
+      });
+    }
+
     function sendGradingCategory() {
       chrome.storage.local.get(["currentGradingCategory"], (res) => {
         port.postMessage({
@@ -194,6 +203,10 @@ function startExternalConnection(db: Dexie) {
             result: "ERROR",
           });
         });
+    }
+
+    function setCourseOrder(courseOrder: string[]) {
+      chrome.storage.local.set({ courseOrder }, sendCourseOrder);
     }
 
     function enableNotifications() {
@@ -344,8 +357,16 @@ function startExternalConnection(db: Dexie) {
         updateCourseSettingsResponse(msg.courseKey, msg.settings);
       }
 
+      if (msg.type === "setCourseOrder") {
+        setCourseOrder(msg.courseOrder);
+      }
+
       if (msg.type === "requestCourseSettings") {
         sendCourseSettings();
+      }
+
+      if (msg.type === "requestCourseOrder") {
+        sendCourseOrder();
       }
 
       if (msg.type === "requestGradingCategory") {
