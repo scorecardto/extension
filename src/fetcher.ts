@@ -461,7 +461,7 @@ const fetchAllContent = async (
     for (const i in reportCard.courses) {
       const c = reportCard.courses[i];
 
-      if (!courseOrder[c.key]) {
+      if (!courseOrder.includes(c.key)) {
         courseOrder.splice(i, 0, c.key); // insert but weird bc js
       }
     }
