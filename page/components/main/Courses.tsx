@@ -13,7 +13,12 @@ function Courses() {
   const loading = useContext(LoadingContext);
   const notifications = useContext(NotificationContext);
 
-  const courses: Course[] | undefined = data.data?.courses;
+  const courses: (Course|undefined)[] | undefined = (
+    data.courseOrder?.map(
+      c => data.data?.courses.find((c2) => c2.key == c)
+    )
+    ?? data.data?.courses
+  )?.filter(c => c && !data.courseSettings[c.key]?.hidden);
 
   return (
     <div
@@ -25,6 +30,8 @@ function Courses() {
         <div>
           <div className="border border-mono-200 rounded-xl overflow-hidden">
             {courses.map((c, i) => {
+              if (!c) return;
+
               return (
                 <CourseGrade
                   courseName={data.courseSettings[c.key]?.displayName ?? c.name}
