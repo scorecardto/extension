@@ -1,6 +1,6 @@
 {
   "name": "Scorecard: Gradebook Viewer",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "manifest_version": 3,
   "description": "Scorecard: Gradebook Viewer for Frontline with Grade Testing, Notifications, and GPA.",
   "homepage_url": "https://scorecardgrades.com",
