@@ -49,9 +49,9 @@ function parseMutations(
     const withValue: GradebookMutation[] = [];
     const withoutValue: GradebookMutation[] = [];
 
-    let icon: GradebookNotification["icon"] = "NEUTRAL";
-    let oldAverage = "";
-    let newAverage = "";
+    let oldAverage = parseInt(mutations[0].oldAverage ?? "");
+    let newAverage = parseInt(mutations[0].newAverage ?? "");
+    let icon: GradebookNotification["icon"] = newAverage > oldAverage ? "RISE" : newAverage < oldAverage ? "FALL" : "NEUTRAL";
 
     const courseName =
       (mutations[0].courseKey && courseSettings[mutations[0].courseKey]?.displayName) ??
@@ -60,27 +60,7 @@ function parseMutations(
 
 	console.log(mutations[0]);
 	console.log(mutations[0].newAverage && mutations[0].oldAverage);
-
-    if (
-      mutations[0].newAverage &&
-      mutations[0].oldAverage &&
-      mutations[0].newAverage > mutations[0].oldAverage
-    ) {
-      oldAverage = mutations[0].oldAverage;
-      newAverage = mutations[0].newAverage;
-
-      icon = "RISE";
-    } else if (
-      mutations[0].newAverage &&
-      mutations[0].oldAverage &&
-      mutations[0].newAverage < mutations[0].oldAverage
-    ) {
-      oldAverage = mutations[0].oldAverage;
-      newAverage = mutations[0].newAverage;
-
-      icon = "FALL";
-    }
-
+    
     mutations.forEach((mutation) => {
       if (mutation.grade && mutation.subject === "assignment") {
         withValue.push(mutation);
